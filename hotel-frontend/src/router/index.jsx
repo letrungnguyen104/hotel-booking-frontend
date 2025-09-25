@@ -1,4 +1,5 @@
 import LayoutDefault from "@/layout/LayoutDefault";
+import Homepage from "@/pages/Homepage/Homepage";
 import Login from "@/pages/Login";
 import Logout from "@/pages/Logout";
 import Register from "@/pages/Register";
@@ -8,16 +9,16 @@ export const route = [
   {
     path: "/",
     element: <LayoutDefault />,
-    // children: [
-    //   {
-    //     index: true, // khi vào / thì chạy cái này
-    //     element: <Navigate to="/homepage" replace />
-    //   },
-    //   {
-    //     path: "homepage",
-    //     ele
-    //   }
-    // ]
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/homepage" replace />
+      },
+      {
+        path: "homepage",
+        element: <Homepage />
+      }
+    ]
   },
   {
     path: "/login",

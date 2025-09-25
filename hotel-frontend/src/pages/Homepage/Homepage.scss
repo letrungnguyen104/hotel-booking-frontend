@@ -1,0 +1,166 @@
+* {
+  font-family: "Poppins", sans-serif;
+}
+
+.ant-input {
+  font-family: "Poppins", sans-serif;
+}
+
+.homepage {
+  .hero-section {
+    position: relative;
+    padding: 50px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 300px;
+      background: url("https://cdn6.agoda.net/images/agodavip/bg-vip-bronze.png") center / cover no-repeat;
+      z-index: -1;
+    }
+  }
+
+  .homepage-content {
+    padding: 40px 20px;
+  }
+}
+
+.form {
+  margin: auto;
+  width: 1100px;
+  max-width: 1100px;
+  height: max-content;
+  padding: 30px 0px;
+
+  &__main {
+    padding: 20px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+  }
+
+  &__search {
+    padding: 20px 10px;
+    margin-bottom: 20px;
+  }
+
+  &__icon {
+    font-size: 18px;
+    color: #bcbcbc;
+  }
+
+  &__title {
+    font-size: 25px;
+    font-weight: 600;
+    color: rgb(110, 110, 110);
+    margin-bottom: 20px;
+
+    &--main {
+      font-size: 24px;
+      font-weight: 600;
+      color: white;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  }
+
+  &__date {
+    padding: 20px 10px;
+    width: 100%;
+  }
+
+  &__dropdown {
+    width: 100%;
+    padding: 20px 10px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #c0c0c0;
+
+    &:hover {
+      border-color: #40a9ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    }
+  }
+
+  &__button {
+    padding: 30px 80px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// Home
+.home {
+  &__title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 20px 0px;
+  }
+
+  &__img {
+    aspect-ratio: 1/1;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__location {
+    font-weight: 600;
+    text-align: center;
+  }
+
+  &__quantity {
+    text-align: center;
+  }
+}
+
+.ant-carousel {
+
+  .slick-prev,
+  .slick-next {
+    font-size: 24px;
+    color: rgb(0, 0, 0);
+    z-index: 10;
+
+    &::before {
+      display: block;
+      color: white;
+      font-size: 20px;
+      line-height: 1;
+      opacity: 1;
+    }
+
+    &:hover::before {
+      color: #40a9ff;
+    }
+  }
+
+  .slick-prev {
+    left: 20px;
+  }
+
+  .slick-next {
+    right: 20px;
+  }
+}

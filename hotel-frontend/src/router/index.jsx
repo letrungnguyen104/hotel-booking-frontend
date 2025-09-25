@@ -1,8 +1,6 @@
 import LayoutDefault from "@/layout/LayoutDefault";
 import Homepage from "@/pages/Homepage/Homepage";
-import Login from "@/pages/Login";
 import Logout from "@/pages/Logout";
-import Register from "@/pages/Register";
 import DDpage from "@/pages/Discount&Offers/D&Dpage";
 import Contactpage from "@/pages/ContactUS/Contactpage";
 import { Navigate } from "react-router";
@@ -25,18 +23,10 @@ export const route = [
         element: <DDpage />
       },
       {
-          path: "contact",
-          element: <Contactpage />
+        path: "contact",
+        element: <Contactpage />
       }
     ]
-  },
-  {
-    path: "/login",
-    element: <Login />
-  },
-  {
-    path: "/register",
-    element: <Register />
   },
   {
     path: "/logout",

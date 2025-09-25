@@ -1,24 +1,18 @@
-body,
-html {
-  margin: 0;
-  padding: 0;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 40px;
-  background-color: #fff;
+  padding: 12px 40px;
+  background: #fff;
   border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
 
-  &__logo {
-    width: 70px;
+  &__logo img {
+    width: 80px;
+    transition: transform 0.2s ease;
 
-    img {
-      width: 100%;
-      height: auto;
-      display: block;
+    &:hover {
+      transform: scale(1.05);
     }
   }
 
@@ -30,30 +24,71 @@ html {
       margin: 0;
       padding: 0;
 
-      li {
+      a {
         position: relative;
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+        padding: 6px 0;
+        transition: color 0.3s;
+        margin-left: 20px;
 
-        a {
-          margin: 0px 20px;
-          text-decoration: none;
-          color: #333;
-          font-weight: 500;
-          padding: 5px 0;
-          transition: color 0.3s;
+        &.active {
+          color: #1890ff;
+        }
 
-          &.active {
-            color: #1890ff;
-          }
+        &::after {
+          content: "";
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 0;
+          height: 2px;
+          background-color: #1890ff;
+          transition: width 0.3s ease;
+        }
 
-          &:hover::after,
-          &.active::after {
+        &:hover {
+          color: #1890ff;
+
+          &::after {
             width: 100%;
           }
-
-          &:hover {
-            color: #1890ff;
-          }
         }
+      }
+    }
+  }
+
+  &__button {
+    display: flex;
+    gap: 10px;
+
+    button {
+      padding: 6px 20px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease-in-out;
+    }
+
+    &--login {
+      background-color: #e6f0ff;
+      color: #1c437b;
+
+      &:hover {
+        background: transparent;
+        border-color: #1c437b;
+      }
+    }
+
+    &--register {
+      background-color: #e8f6f2;
+      color: #126236;
+
+      &:hover {
+        background: transparent;
+        border-color: #126236;
       }
     }
   }
@@ -63,18 +98,12 @@ html {
     align-items: center;
     gap: 15px;
 
-    p {
-      margin: 0;
-      font-weight: 500;
-      color: #333;
-    }
-
     .header__avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s ease;
 
       &:hover {
         transform: scale(1.1);
@@ -83,15 +112,15 @@ html {
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    padding: 10px 20px;
 
     &__nav ul {
       flex-direction: column;
-      gap: 10px;
+      align-items: center;
     }
   }
 }

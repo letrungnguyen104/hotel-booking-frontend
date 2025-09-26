@@ -4,6 +4,7 @@ import Logout from "@/pages/Logout";
 import DDpage from "@/pages/Discount&Offers/D&Dpage";
 import Contactpage from "@/pages/ContactUS/Contactpage";
 import { Navigate } from "react-router";
+import ListRoomSearch from "@/pages/ListRoomSearch/ListRoomSearch";
 
 export const route = [
   {
@@ -15,7 +16,7 @@ export const route = [
         element: <Navigate to="/homepage" replace />
       },
       {
-        path: "homepage",
+        path: "/homepage",
         element: <Homepage />
       },
       {
@@ -25,6 +26,10 @@ export const route = [
       {
         path: "contact",
         element: <Contactpage />
+      },
+      {
+        path: "search",
+        element: <ListRoomSearch />
       }
     ]
   },

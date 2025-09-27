@@ -2,6 +2,7 @@ import { Card, Rate, Tag } from "antd";
 import React from "react";
 import "./RoomListHome.scss";
 import { EnvironmentOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const roomList = [
   {
@@ -112,10 +113,24 @@ const roomList = [
 ];
 
 const RoomListHome = () => {
+  const navigate = useNavigate();
+
+  const handleHotelClick = (hotel) => {
+    if (hotel.id === 7) {
+      navigate("/hotel/palm-garden-resort");
+    }
+  };
+
   return (
     <div className="hotel-list">
       {roomList.map((room) => (
-        <Card key={room.id} className="hotel-card" hoverable>
+        <Card
+          key={room.id}
+          className="hotel-card"
+          hoverable
+          onClick={() => handleHotelClick(room)}
+          style={{ cursor: "pointer" }}
+        >
           {/* Bên trái: ảnh */}
           <div className="hotel-card__left">
             <img src={room.image} alt={room.name} />

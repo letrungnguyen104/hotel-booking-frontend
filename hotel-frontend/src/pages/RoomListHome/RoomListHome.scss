@@ -1,0 +1,132 @@
+.hotel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hotel-card {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .ant-card-body {
+    display: flex;
+    padding: 0; // bỏ padding mặc định
+    width: 100%;
+  }
+
+  &__left {
+    width: 35%;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .hotel-card__score {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: #0071c2;
+      color: #fff;
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+  }
+
+  &__right {
+    width: 65%;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .hotel-card__title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  }
+
+  &__location {
+    color: #666;
+    margin: 5px 0 10px;
+    font-size: 14px;
+  }
+
+  &__offers {
+    margin: 10px 0;
+
+    .ant-tag {
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+  }
+
+  &__price {
+    .old-price {
+      text-decoration: line-through;
+      color: #999;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+
+    .new-price {
+      font-size: 18px;
+      font-weight: bold;
+      color: #e74c3c;
+      margin-right: 8px;
+    }
+
+    .discount {
+      color: #27ae60;
+      font-weight: bold;
+    }
+
+    .free-cancel {
+      font-size: 12px;
+      color: #27ae60;
+      margin: 2px 0 0;
+    }
+  }
+
+  &__review {
+    text-align: right;
+
+    .score-box {
+      background: #0071c2;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .review-text {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .review-count {
+      font-size: 12px;
+      color: #555;
+    }
+  }
+}

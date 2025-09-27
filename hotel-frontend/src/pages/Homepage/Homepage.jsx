@@ -2,7 +2,7 @@ import React from "react";
 import "./Homepage.scss";
 import { Col, Input, Row, Form, DatePicker, Dropdown, Space, Button, Carousel, Tabs } from "antd";
 import { DownOutlined, SearchOutlined } from "@ant-design/icons";
-import RoomListHome from "@/components/RoomListHome/RoomListHome";
+import RoomListHome from '../RoomListHome/RoomListHome';
 import { useNavigate } from "react-router";
 
 const { RangePicker } = DatePicker;

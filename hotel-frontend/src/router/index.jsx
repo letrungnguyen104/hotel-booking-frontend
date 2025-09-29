@@ -30,7 +30,8 @@ export const route = [
       {
         path: "search",
         element: <ListRoomSearch />
-      }
+      },
+
     ]
   },
   {

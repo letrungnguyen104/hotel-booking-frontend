@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import "./ListRoomSearch.scss";
 import Search from '@/components/Search/Search';
 import { Card, Rate, Slider, Tag } from 'antd';
@@ -113,11 +113,16 @@ const roomList = [
 ];
 
 const ListRoomSearch = () => {
+  const handleHotelClick = (room) => {
+    console.log("Clicked room:", room);
+  };
+
   return (
     <>
       <div className="search-bar">
         <Search />
       </div>
+
       <div className="main-content">
         {/* Sidebar trái (bộ lọc) */}
         <aside className="sidebar">
@@ -258,7 +263,7 @@ const ListRoomSearch = () => {
         </section>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ListRoomSearch
+export default ListRoomSearch;

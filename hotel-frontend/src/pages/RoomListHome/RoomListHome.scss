@@ -1,132 +1,92 @@
-.hotel-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+.room-card {
 
-.hotel-card {
-  display: flex;
-  flex-direction: row;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-
-  .ant-card-body {
-    display: flex;
-    padding: 0; // bỏ padding mặc định
+  &__image {
+    aspect-ratio: 4/3;
     width: 100%;
-  }
+    height: auto;
+    overflow: hidden;
 
-  &__left {
-    width: 35%;
-    position: relative;
+    &:hover img {
+      transform: scale(1.12);
+    }
 
     img {
       width: 100%;
-      height: 220px;
+      height: 100%;
       object-fit: cover;
+      transition: transform 0.3s ease;
+      transform-origin: center center;
     }
 
-    .hotel-card__score {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
-      background: #0071c2;
-      color: #fff;
-      padding: 5px 8px;
-      border-radius: 4px;
-      font-weight: bold;
+    &-wrapper {
+      position: relative;
     }
   }
 
-  &__right {
-    width: 65%;
-    padding: 15px;
+  &__score {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 2px;
+    width: 30px;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    border-radius: 3px;
+    color: white;
+    font-weight: 600;
+    background-color: rgb(75, 75, 255);
+  }
 
-    .hotel-card__title {
-      font-size: 18px;
-      font-weight: bold;
-    }
+  &__title {
+    font-weight: 600;
+  }
+
+  &__rating {
+    font-size: 13px;
+    margin-right: 5px;
   }
 
   &__location {
-    color: #666;
-    margin: 5px 0 10px;
-    font-size: 14px;
-  }
-
-  &__offers {
-    margin: 10px 0;
-
-    .ant-tag {
-      margin-right: 5px;
-      margin-bottom: 5px;
-    }
-  }
-
-  &__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-top: auto;
+    font-weight: 500;
+    color: rgb(90, 90, 255);
+    font-size: 12px;
   }
 
   &__price {
-    .old-price {
-      text-decoration: line-through;
-      color: #999;
-      margin-right: 8px;
-      font-size: 14px;
-    }
-
-    .new-price {
-      font-size: 18px;
-      font-weight: bold;
-      color: #e74c3c;
-      margin-right: 8px;
-    }
-
-    .discount {
-      color: #27ae60;
-      font-weight: bold;
-    }
-
-    .free-cancel {
-      font-size: 12px;
-      color: #27ae60;
-      margin: 2px 0 0;
-    }
+    font-weight: 600;
+    color: red;
+    font-size: 18px;
   }
 
-  &__review {
-    text-align: right;
+}
 
-    .score-box {
-      background: #0071c2;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
-      margin-right: 5px;
-    }
+// Config card body
+.room-card {
+  display: flex;
+  flex-direction: column;
 
-    .review-text {
-      font-weight: bold;
-      color: #333;
-    }
-
-    .review-count {
-      font-size: 12px;
-      color: #555;
-    }
+  .ant-card-body {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
+}
+
+
+.room-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.room-list .ant-col {
+  display: flex;
+}
+
+.room-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
 }

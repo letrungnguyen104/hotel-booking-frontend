@@ -126,7 +126,7 @@ const ListRoomSearch = () => {
       <div className="main-content">
         {/* Sidebar trái (bộ lọc) */}
         <aside className="sidebar">
-          <h3 className="sidebar-title">Khách sạn ở Đà Nẵng</h3>
+          <h3 className="sidebar-title">Hotels</h3>
 
           {/* Budget */}
           <div className="filter-group">
@@ -136,22 +136,22 @@ const ListRoomSearch = () => {
               <input type="number" defaultValue={300000} /> -{" "}
               <input type="number" defaultValue={5000000} />
             </div>
-            <p className="price-range">300.000 ₫ – 5.000.000 ₫</p>
+            <p className="price-range">300.000 ₫ - 5.000.000 ₫</p>
           </div>
 
           {/* Giá mỗi đêm */}
           <div className="filter-group">
-            <h4>Giá mỗi đêm</h4>
+            <h4>Budget (per night)</h4>
             <label><input type="checkbox" /> Dưới 500.000 ₫</label>
-            <label><input type="checkbox" /> 500.000 ₫ – 1.000.000 ₫</label>
-            <label><input type="checkbox" /> 1.000.000 ₫ – 2.000.000 ₫</label>
-            <label><input type="checkbox" /> 2.000.000 ₫ – 5.000.000 ₫</label>
+            <label><input type="checkbox" /> 500.000 ₫ - 1.000.000 ₫</label>
+            <label><input type="checkbox" /> 1.000.000 ₫ - 2.000.000 ₫</label>
+            <label><input type="checkbox" /> 2.000.000 ₫ - 5.000.000 ₫</label>
             <label><input type="checkbox" /> Trên 5.000.000 ₫</label>
           </div>
 
           {/* Hạng sao */}
           <div className="filter-group">
-            <h4>Hạng sao</h4>
+            <h4>Rating</h4>
             <label><Rate disabled defaultValue={5} /></label>
             <label><Rate disabled defaultValue={4} /></label>
             <label><Rate disabled defaultValue={3} /></label>
@@ -159,40 +159,40 @@ const ListRoomSearch = () => {
 
           {/* Tiện nghi */}
           <div className="filter-group">
-            <h4>Tiện nghi</h4>
-            <label><input type="checkbox" /> Wi-Fi miễn phí</label>
-            <label><input type="checkbox" /> Hồ bơi</label>
-            <label><input type="checkbox" /> Nhà hàng</label>
+            <h4></h4>
+            <label><input type="checkbox" /> Free Wi-Fi</label>
+            <label><input type="checkbox" /> Pool</label>
+            <label><input type="checkbox" /> Restaurant</label>
           </div>
 
           {/* Vị trí */}
           <div className="filter-group">
-            <h4>Vị trí</h4>
-            <label><input type="checkbox" /> Bãi biển Mỹ Khê</label>
-            <label><input type="checkbox" /> Sông Hàn</label>
-            <label><input type="checkbox" /> Trung tâm thành phố</label>
+            <h4>Location</h4>
+            <label><input type="checkbox" /> My Khe Beach</label>
+            <label><input type="checkbox" /> Han River</label>
+            <label><input type="checkbox" /> Downtown</label>
           </div>
 
           {/* Đánh giá */}
           <div className="filter-group">
-            <h4>Đánh giá</h4>
-            <label><input type="checkbox" /> Xuất sắc (8+)</label>
-            <label><input type="checkbox" /> Rất tốt (8+)</label>
-            <label><input type="checkbox" /> Tốt (7+)</label>
+            <h4>Evaluate</h4>
+            <label><input type="checkbox" /> Excellent (8+)</label>
+            <label><input type="checkbox" /> Very good (8+)</label>
+            <label><input type="checkbox" /> Good (7+)</label>
           </div>
         </aside>
 
         {/* Phần chính giữa */}
         <section className="hotel-list-section">
           <div className="list-header">
-            <h2>Kết quả tìm kiếm</h2>
+            <h2>Search Results</h2>
             <div className="sort-box">
-              <label>Sắp xếp:</label>
+              <label>Sort:</label>
               <select>
-                <option value="popular">Phổ biến nhất</option>
-                <option value="priceLow">Giá thấp nhất</option>
-                <option value="priceHigh">Giá cao nhất</option>
-                <option value="rating">Đánh giá cao</option>
+                <option value="popular">Most Popular</option>
+                <option value="priceLow">Lowest Price</option>
+                <option value="priceHigh">Highest Price</option>
+                <option value="rating">Highest Rating</option>
               </select>
             </div>
           </div>

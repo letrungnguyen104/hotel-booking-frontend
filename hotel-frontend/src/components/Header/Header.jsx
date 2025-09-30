@@ -14,24 +14,32 @@ import { setUser, clearUser } from "@/action/user";
 import ClipLoader from "react-spinners/ClipLoader";
 
 function Header() {
-  const items = [
-    { key: "1", label: "My Account", disabled: true },
-    { type: "divider" },
-    { key: "2", label: "Profile" },
-    { key: "3", label: "Hotel business registration" },
-    { key: "4", label: "Billing" },
-    { key: "5", label: "Log out", icon: <LogoutOutlined /> },
-  ];
-
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const [loadingUser, setLoadingUser] = useState(true); // ✅ trạng thái loading
+  const [loadingUser, setLoadingUser] = useState(true);
 
   const isLogin = useSelector((state) => state.loginReducer);
   const userDetails = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
+
+  // ✅ Kiểm tra role
+  const isHotelAdmin = userDetails?.roles?.some(
+    (role) => role.roleName === "HOTEL_ADMIN"
+  );
+
+  // ✅ Menu động
+  const items = [
+    { key: "1", label: "My Account", disabled: true },
+    { type: "divider" },
+    { key: "2", label: "Profile" },
+    isHotelAdmin
+      ? { key: "3", label: "Hotel Management" }
+      : { key: "3", label: "Hotel business registration" },
+    { key: "4", label: "Billing" },
+    { key: "5", label: "Log out", icon: <LogoutOutlined /> },
+  ];
 
   useEffect(() => {
     const token = getToken();

@@ -50,10 +50,11 @@ const Homepage = () => {
   ];
 
   const itemsTab = [
-    { key: "1", label: "Ha Noi", children: <RoomListHome /> },
-    { key: "2", label: "Da Nang", children: <RoomListHome /> },
-    { key: "3", label: "Ho Chi Minh", children: <RoomListHome /> },
+    { key: "1", label: "Ha Noi", children: <RoomListHome city="Ha Noi" /> },
+    { key: "2", label: "Da Nang", children: <RoomListHome city="Da Nang" /> },
+    { key: "3", label: "Ho Chi Minh", children: <RoomListHome city="Ho Chi Minh" /> },
   ];
+
 
   return (
     <div className="homepage">

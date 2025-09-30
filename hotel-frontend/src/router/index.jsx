@@ -5,6 +5,11 @@ import DDpage from "@/pages/Discount&Offers/D&Dpage";
 import Contactpage from "@/pages/ContactUS/Contactpage";
 import { Navigate } from "react-router";
 import ListRoomSearch from "@/pages/ListRoomSearch/ListRoomSearch";
+import HotelAdminDashboard from "@/pages/HotelAdminDashboard/HotelAdminDashboard";
+import Dashboard from "@/pages/HotelAdmin/Dashboard/Dashboard";
+import HotelManagement from "@/pages/HotelAdmin/HotelManagement/HotelManagement";
+import BookingManagement from "@/pages/HotelAdmin/BookingManagement/BookingManagement";
+import AmenityManagement from "@/pages/HotelAdmin/AmenityManagement/AmenityManagement";
 
 export const route = [
   {
@@ -31,7 +36,28 @@ export const route = [
         path: "search",
         element: <ListRoomSearch />
       },
-
+      {
+        path: "hotel-admin-dashboard",
+        element: <HotelAdminDashboard />,
+        children: [
+          {
+            path: "dashboard",
+            element: <Dashboard />
+          },
+          {
+            path: "hotel-management",
+            element: <HotelManagement />
+          },
+          {
+            path: "booking-management",
+            element: <BookingManagement />
+          },
+          {
+            path: "amenity-management",
+            element: <AmenityManagement />
+          }
+        ]
+      }
     ]
   },
   {

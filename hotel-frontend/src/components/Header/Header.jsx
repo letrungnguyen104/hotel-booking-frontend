@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import "./Header.scss";
 import { LogoutOutlined } from "@ant-design/icons";
 import { Dropdown, Space, Modal, Form, Input, Button } from "antd";
@@ -14,6 +14,7 @@ import { setUser, clearUser } from "@/action/user";
 import ClipLoader from "react-spinners/ClipLoader";
 
 function Header() {
+  const navigate = useNavigate();
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -23,13 +24,9 @@ function Header() {
   const isLogin = useSelector((state) => state.loginReducer);
   const userDetails = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
-
-  // ✅ Kiểm tra role
   const isHotelAdmin = userDetails?.roles?.some(
     (role) => role.roleName === "HOTEL_ADMIN"
   );
-
-  // ✅ Menu động
   const items = [
     { key: "1", label: "My Account", disabled: true },
     { type: "divider" },
@@ -121,6 +118,15 @@ function Header() {
     toast.info("You have been logged out!");
   };
 
+  const handleMenuClick = ({ key }) => {
+    if (key === "5") {
+      handleLogout();
+    } else if (key === "3" && isHotelAdmin) {
+      navigate("/hotel-admin-dashboard");
+    }
+  };
+
+
   return (
     <>
       <div className="header">
@@ -157,7 +163,7 @@ function Header() {
               <Notify />
             </div>
             <p className="header__name">Hi! {userDetails.username}</p>
-            <Dropdown menu={{ items, onClick: ({ key }) => key === "5" && handleLogout() }}>
+            <Dropdown menu={{ items, onClick: handleMenuClick }}>
               <a onClick={(e) => e.preventDefault()}>
                 <Space>
                   <img

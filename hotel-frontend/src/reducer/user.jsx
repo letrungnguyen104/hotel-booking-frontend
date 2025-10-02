@@ -10,6 +10,8 @@ const userReducer = (state = initialState, action) => {
       return action.payload;
     case "CLEAR_USER":
       localStorage.removeItem("userDetails");
+      localStorage.removeItem("token");
+      localStorage.removeItem("token_expiry");
       return null;
     default:
       return state;

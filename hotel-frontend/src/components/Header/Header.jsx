@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkLogin } from "@/action/login";
 import { setUser, clearUser } from "@/action/user";
 import ClipLoader from "react-spinners/ClipLoader";
+import { preRegister, verifyRegister } from "@/service/userService";
 
 function Header() {
   const navigate = useNavigate();
@@ -20,6 +21,10 @@ function Header() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [otpForm] = Form.useForm();
+  const [pendingEmail, setPendingEmail] = useState(null);
+  const [loadingRegister, setLoadingRegister] = useState(false);
 
   const isLogin = useSelector((state) => state.loginReducer);
   const userDetails = useSelector((state) => state.userReducer);
@@ -89,25 +94,45 @@ function Header() {
 
   const handleRegister = async (values) => {
     try {
-      const response = await register(values);
-      console.log("Register response:", response);
+      const { confirmPassword, ...userData } = values;
+      setLoadingRegister(true);
+      const response = await preRegister(userData);
+      console.log("PreRegister response:", response);
 
-      if (response.code === 1001) {
-        toast.success("Register successfully! Please login.");
-        registerForm.resetFields();
+      if (response.message?.includes("Verification code sent")) {
+        setLoadingRegister(false);
+        toast.success("Verification code sent to your email!");
+        setPendingEmail(userData.email);
         setIsRegisterModalOpen(false);
-        setIsLoginModalOpen(true);
-      } else if (response.code === 1012 && response.message.includes("Email")) {
-        toast.error("Email already in use!");
-      } else if (response.code === 1011 && response.message.includes("Username")) {
-        toast.error("Username already in use!");
-      } else if (response.code === 1004) {
-        toast.error("Password must be at least 8 characters!");
+        setIsOtpModalOpen(true);
       } else {
-        toast.error("Register failed!");
+        toast.error(response.message || "Register failed!");
       }
     } catch (error) {
       console.error("Register error:", error);
+      toast.error("Something went wrong!");
+    } finally {
+      setLoadingRegister(false);
+    }
+  };
+
+  const handleVerifyOtp = async (values) => {
+    try {
+      const response = await verifyRegister({
+        email: pendingEmail,
+        code: values.code,
+      });
+
+      if (response.result) {
+        toast.success("Register successfully! Please login.");
+        otpForm.resetFields();
+        setIsOtpModalOpen(false);
+        setIsLoginModalOpen(true);
+      } else {
+        toast.error("Invalid verification code!");
+      }
+    } catch (error) {
+      console.error("Verify OTP error:", error);
       toast.error("Something went wrong!");
     }
   };
@@ -248,8 +273,29 @@ function Header() {
           >
             <Input.Password placeholder="Confirm your password" />
           </Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" loading={loadingRegister} htmlType="submit" block>
             Register
+          </Button>
+        </Form>
+      </Modal>
+      {/* OTP Modal */}
+      <Modal
+        title="Email Verification"
+        open={isOtpModalOpen}
+        onCancel={() => setIsOtpModalOpen(false)}
+        footer={null}
+        centered
+      >
+        <Form form={otpForm} layout="vertical" onFinish={handleVerifyOtp}>
+          <Form.Item
+            label="Verification Code"
+            name="code"
+            rules={[{ required: true, message: "Please enter the code sent to your email" }]}
+          >
+            <Input placeholder="Enter verification code" />
+          </Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Verify
           </Button>
         </Form>
       </Modal>

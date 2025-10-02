@@ -10,3 +10,13 @@ export const register = async (userData) => {
   const response = await postPublic(`users/register`, userData);
   return response;
 }
+
+export const preRegister = async (userData) => {
+  const response = await postPublic(`users/pre-register`, userData);
+  return response;
+};
+
+export const verifyRegister = async (data) => {
+  const response = await postPublic(`users/verify-register`, data);
+  return response;
+};

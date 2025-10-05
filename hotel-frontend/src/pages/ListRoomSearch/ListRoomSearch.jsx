@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import "./ListRoomSearch.scss";
 import Search from '@/components/Search/Search';
 import { Card, Rate, Slider, Tag } from 'antd';
@@ -113,8 +114,12 @@ const roomList = [
 ];
 
 const ListRoomSearch = () => {
+  const navigate = useNavigate();
+
   const handleHotelClick = (room) => {
     console.log("Clicked room:", room);
+    // Điều hướng đến trang chi tiết khách sạn với ID tương ứng
+    navigate(`/hotel/${room.id}`);
   };
 
   return (

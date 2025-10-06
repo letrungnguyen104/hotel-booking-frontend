@@ -10,7 +10,7 @@ import HotelAdminDashboard from "@/pages/HotelAdminDashboard/HotelAdminDashboard
 import Dashboard from "@/pages/HotelAdmin/Dashboard/Dashboard";
 import HotelManagement from "@/pages/HotelAdmin/HotelManagement/HotelManagement";
 import BookingManagement from "@/pages/HotelAdmin/BookingManagement/BookingManagement";
-import AmenityManagement from "@/pages/HotelAdmin/AmenityManagement/AmenityManagement";
+import RoomTypeManagement from "@/pages/HotelAdmin/RoomTypeManagement/RoomTypeManagement";
 
 // Cấu hình routes cho ứng dụng
 export const route = [
@@ -55,8 +55,8 @@ export const route = [
             element: <BookingManagement />,
           },
           {
-            path: "amenity-management",
-            element: <AmenityManagement />,
+            path: "room-type-management",
+            element: <RoomTypeManagement />,
           },
         ]
       },

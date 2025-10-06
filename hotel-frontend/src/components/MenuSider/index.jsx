@@ -20,9 +20,9 @@ function MenuSider() {
       key: "bookingmanagement",
     },
     {
-      label: <Link to="/hotel-admin-dashboard/amenity-management">Amenity Management</Link>,
+      label: <Link to="/hotel-admin-dashboard/room-type-management">Room Type Management</Link>,
       icon: <SignatureOutlined />,
-      key: "amenitymanagement",
+      key: "roomtypemanagement",
     },
   ];
 

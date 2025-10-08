@@ -11,6 +11,7 @@ import Dashboard from "@/pages/HotelAdmin/Dashboard/Dashboard";
 import HotelManagement from "@/pages/HotelAdmin/HotelManagement/HotelManagement";
 import BookingManagement from "@/pages/HotelAdmin/BookingManagement/BookingManagement";
 import RoomTypeManagement from "@/pages/HotelAdmin/RoomTypeManagement/RoomTypeManagement";
+import AdminHotelDetail from "../pages/HotelDetailManagement/AdminHotelDetail/AdminHotelDetail";
 
 // Cấu hình routes cho ứng dụng
 export const route = [
@@ -57,6 +58,10 @@ export const route = [
           {
             path: "room-type-management",
             element: <RoomTypeManagement />,
+          },
+          {
+            path: "hotel/:id",
+            element: <AdminHotelDetail />,
           },
         ]
       },

@@ -112,10 +112,14 @@ const HotelManagement = () => {
           <Empty description="No hotels found. Add your first hotel!" />
         ) : (
           hotels.map((hotel) => (
-            <div className="hotel-item" key={hotel.id}>
+            <div
+              className="hotel-item cursor-pointer hover:shadow-lg transition"
+              key={hotel.id}
+              onClick={() => navigate(`/hotel-admin-dashboard/hotel/${hotel.id}`)}
+            >
               <div
                 className="hotel-item__image"
-                onClick={() => navigate(`/hotel/${hotel.id}`)}
+                onClick={() => navigate(`/hotel-admin-dashboard/hotel/${hotel.id}`)}
               >
                 <img
                   src={
@@ -154,7 +158,7 @@ const HotelManagement = () => {
                 <Button
                   size="small"
                   type="default"
-                  onClick={() => navigate(`/hotel/${hotel.id}`)}
+                  onClick={() => navigate(`/hotel-admin-dashboard/hotel/${hotel.id}`)}
                 >
                   View
                 </Button>

@@ -14,16 +14,18 @@ import { getHotelsByOwner } from "@/service/hotelService";
 import AddHotelModal from "@/components/AddHotelModal/AddHotelModal";
 import { useNavigate } from "react-router";
 import "./HotelManagement.scss";
+import EditHotelModal from "@/components/EditHotelModal/EditHotelModal";
 
 const HotelManagement = () => {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingHotelId, setEditingHotelId] = useState(null);
   const navigate = useNavigate();
   const BASE_URL = "http://localhost:8081";
 
-  // ✅ Fetch danh sách khách sạn
   const fetchHotels = async (status = null) => {
     setLoading(true);
     try {
@@ -142,9 +144,10 @@ const HotelManagement = () => {
                   size="small"
                   type="primary"
                   ghost
-                  onClick={() =>
-                    navigate(`/hotel-admin-dashboard/edit/${hotel.id}`)
-                  }
+                  onClick={() => {
+                    setEditingHotelId(hotel.id);
+                    setEditModalOpen(true);
+                  }}
                 >
                   Edit
                 </Button>
@@ -164,6 +167,12 @@ const HotelManagement = () => {
       <AddHotelModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onSuccess={() => fetchHotels(selectedStatus)}
+      />
+      <EditHotelModal
+        open={editModalOpen}
+        hotelId={editingHotelId}
+        onClose={() => setEditModalOpen(false)}
         onSuccess={() => fetchHotels(selectedStatus)}
       />
     </div>

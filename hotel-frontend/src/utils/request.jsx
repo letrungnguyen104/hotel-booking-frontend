@@ -72,9 +72,21 @@ export const patchFormData = async (path, formData) => {
   const response = await fetch(API_DOMAIN + path, {
     method: "PATCH",
     headers: {
-      ...getAuthHeaders() // Không set Content-Type
+      ...getAuthHeaders()
     },
     body: formData
+  });
+  return await response.json();
+};
+
+
+export const putFormData = async (path, formData) => {
+  const response = await fetch(API_DOMAIN + path, {
+    method: "PUT",
+    headers: {
+      ...getAuthHeaders(),
+    },
+    body: formData,
   });
   return await response.json();
 };

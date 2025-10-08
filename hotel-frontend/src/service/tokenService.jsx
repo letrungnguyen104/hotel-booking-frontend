@@ -8,7 +8,6 @@ export const setToken = (token, expiryInMinutes = 60) => {
   localStorage.setItem("token_expiry", expiryTime);
 };
 
-// Lấy token và kiểm tra hết hạn
 export const getToken = () => {
   const token = localStorage.getItem("token");
   const expiryTime = localStorage.getItem("token_expiry");
@@ -16,7 +15,6 @@ export const getToken = () => {
   if (!token || !expiryTime) return null;
 
   if (new Date().getTime() > Number(expiryTime)) {
-    // token hết hạn
     localStorage.removeItem("token");
     localStorage.removeItem("token_expiry");
     return null;
@@ -35,7 +33,7 @@ export const getUserIdFromToken = () => {
   if (!token) return null;
   try {
     const decoded = jwtDecode(token);
-    return decoded.userId; // Phần này phải trùng với key bạn kí trong token backend
+    return decoded.userId;
   } catch (error) {
     console.error("Invalid token", error);
     return null;

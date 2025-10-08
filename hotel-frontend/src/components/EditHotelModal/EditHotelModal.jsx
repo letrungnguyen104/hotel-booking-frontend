@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Select, Upload, Button, Spin, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { getHotelById, updateHotel } from "@/service/hotelService";
+import { toast } from "sonner";
 
 const { Option } = Select;
 
@@ -65,12 +66,12 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
       });
 
       await updateHotel(hotelId, formData);
-      message.success("Hotel updated successfully");
+      toast.success("Update hotel successfully!")
       onSuccess();
       onClose();
     } catch (err) {
       console.error("Error updating hotel:", err);
-      message.error("Failed to update hotel");
+      toast.error("Failed to update hotel!");
     }
   };
 

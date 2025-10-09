@@ -24,7 +24,6 @@ const HotelManagement = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingHotelId, setEditingHotelId] = useState(null);
   const navigate = useNavigate();
-  const BASE_URL = "http://localhost:8081";
 
   const fetchHotels = async (status = null) => {
     setLoading(true);
@@ -124,7 +123,7 @@ const HotelManagement = () => {
                 <img
                   src={
                     hotel.images?.length > 0
-                      ? `${BASE_URL}${hotel.images[0]}`
+                      ? `${hotel.images[0]}`
                       : "/fallback.jpg"
                   }
                   alt={hotel.name}

@@ -8,7 +8,6 @@ import RoomTab from "../RoomTab.jsx/RoomTab";
 import EditHotelModal from "@/components/EditHotelModal/EditHotelModal";
 
 const { TabPane } = Tabs;
-const BASE_URL = "http://localhost:8081";
 
 const HotelDetail = () => {
   const { id } = useParams();
@@ -51,7 +50,7 @@ const HotelDetail = () => {
             {hotel.images?.length > 0 ? (
               hotel.images.map((img, index) => (
                 <div key={index}>
-                  <img src={`${BASE_URL}${img}`} alt={`Hotel ${index}`} />
+                  <img src={`${img}`} alt={`Hotel ${index}`} />
                 </div>
               ))
             ) : (

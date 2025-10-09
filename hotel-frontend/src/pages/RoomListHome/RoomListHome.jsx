@@ -7,7 +7,6 @@ import { topFiveHotel } from "@/service/hotelService";
 const RoomListHome = ({ city }) => {
   const [roomList, setRoomList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const PATH_IMG = `http://localhost:8081`
 
   console.log(city);
 
@@ -47,7 +46,7 @@ const RoomListHome = ({ city }) => {
                 <div className="room-card__image-wrapper">
                   <div className="room-card__image">
                     <img
-                      src={`${PATH_IMG}${room.image}`}
+                      src={`${room.image}`}
                       alt={room.name}
                       className="room-card__image"
                     />

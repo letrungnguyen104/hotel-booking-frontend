@@ -10,10 +10,15 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const BASE_URL = "http://localhost:8081";
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (open && hotelId) fetchHotelData();
+    if (open && hotelId) {
+      fetchHotelData();
+    } else if (!open) {
+      form.resetFields();
+      setFileList([]);
+    }
   }, [open, hotelId]);
 
   const fetchHotelData = async () => {
@@ -33,12 +38,14 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
       if (hotel.images && hotel.images.length > 0) {
         setFileList(
           hotel.images.map((url, index) => ({
-            uid: String(index),
+            uid: `old-${index}`,
             name: url.split("/").pop(),
             status: "done",
-            url: `${BASE_URL}${url}`,
+            url: url,
           }))
         );
+      } else {
+        setFileList([]);
       }
     } catch (err) {
       message.error("Failed to load hotel info");
@@ -51,14 +58,16 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      setIsSubmitting(true);
 
       const formData = new FormData();
       formData.append("request", JSON.stringify(values));
+
       const remainingImages = fileList
         .filter((file) => !file.originFileObj && file.url)
-        .map((file) => file.url.replace(BASE_URL, ""));
-
+        .map((file) => file.url);
       formData.append("remainingImages", JSON.stringify(remainingImages));
+
       fileList.forEach((file) => {
         if (file.originFileObj) {
           formData.append("files", file.originFileObj);
@@ -66,12 +75,14 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
       });
 
       await updateHotel(hotelId, formData);
-      toast.success("Update hotel successfully!")
+      toast.success("Update hotel successfully!");
       onSuccess();
       onClose();
     } catch (err) {
       console.error("Error updating hotel:", err);
       toast.error("Failed to update hotel!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -83,6 +94,7 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
       onOk={handleOk}
       okText="Save Changes"
       width={600}
+      okButtonProps={{ loading: isSubmitting }}
     >
       {loading ? (
         <div className="flex justify-center items-center h-60">
@@ -90,6 +102,7 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
         </div>
       ) : (
         <Form form={form} layout="vertical">
+          {/* Các Form.Item giữ nguyên... */}
           <Form.Item label="Hotel Name" name="name" rules={[{ required: true }]}>
             <Input placeholder="Enter hotel name" />
           </Form.Item>
@@ -117,11 +130,9 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
           <Form.Item label="Status" name="status">
             <Select disabled={form.getFieldValue("status") === "PENDING"}>
               <Option value="ACTIVE">Active</Option>
-              {/* <Option value="PENDING">Pending</Option> Có thể bỏ nếu user không được đổi */}
               <Option value="CLOSED">Closed</Option>
             </Select>
           </Form.Item>
-
 
           <Form.Item label="Images">
             <Upload
@@ -130,9 +141,6 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
               fileList={fileList}
               beforeUpload={() => false}
               onChange={({ fileList }) => setFileList(fileList)}
-              onRemove={(file) => {
-                setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
-              }}
             >
               <Button icon={<UploadOutlined />}>Upload new images</Button>
             </Upload>

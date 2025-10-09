@@ -48,7 +48,7 @@ const AddHotelModal = ({ open, onClose, onSuccess }) => {
   const uploadProps = {
     multiple: true,
     listType: "picture-card",
-    beforeUpload: () => false, // không upload ngay, chỉ lưu local
+    beforeUpload: () => false,
     onChange: ({ fileList }) => setFileList(fileList),
     fileList,
   };

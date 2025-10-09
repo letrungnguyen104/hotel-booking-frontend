@@ -24,7 +24,6 @@ import {
 } from "@ant-design/icons";
 import { getRoomTypesByHotel } from "@/service/roomTypeService";
 import { getAmenities } from "@/service/amenityService";
-import { putFormData } from "@/utils/request";
 import "./RoomTypeTab.scss";
 import { toast } from "sonner";
 import { updateRoomType } from "@/service/roomTypeService";
@@ -44,8 +43,8 @@ const RoomTypeTab = ({ hotelId }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingType, setEditingType] = useState(null);
   const [fileList, setFileList] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false); // State mới cho loading button
   const [form] = Form.useForm();
-  const BASE_URL = "http://localhost:8081";
 
   const statusColor = {
     ACTIVE: "green",
@@ -54,6 +53,7 @@ const RoomTypeTab = ({ hotelId }) => {
   };
 
   const fetchRoomTypes = async () => {
+    setLoading(true);
     try {
       const data = await getRoomTypesByHotel(hotelId);
       const reversed = (data || []).reverse();
@@ -66,7 +66,6 @@ const RoomTypeTab = ({ hotelId }) => {
       setLoading(false);
     }
   };
-
 
   const fetchAmenities = async () => {
     try {
@@ -106,7 +105,7 @@ const RoomTypeTab = ({ hotelId }) => {
           uid: `old-${i}`,
           name: `image-${i}`,
           status: "done",
-          url: `${BASE_URL}${url}`,
+          url: url,
         })) || []
       );
     } else {
@@ -119,6 +118,7 @@ const RoomTypeTab = ({ hotelId }) => {
   const handleCreateRoomType = async () => {
     try {
       const values = await form.validateFields();
+      setIsSubmitting(true);
 
       const formData = new FormData();
       const request = {
@@ -138,9 +138,7 @@ const RoomTypeTab = ({ hotelId }) => {
       const res = await createRoomType(formData);
       if (res) {
         toast.success("Room type created successfully!");
-        setRoomTypes((prev) => [res, ...prev]);
-        setFilteredTypes((prev) => [res, ...prev]);
-
+        fetchRoomTypes(); // Tải lại danh sách
         setIsModalVisible(false);
       } else {
         message.error("Failed to create room type");
@@ -148,12 +146,15 @@ const RoomTypeTab = ({ hotelId }) => {
     } catch (error) {
       console.error(error);
       message.error("Error creating room type");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleUpdateRoomType = async () => {
     try {
       const values = await form.validateFields();
+      setIsSubmitting(true);
 
       const formData = new FormData();
       const request = {
@@ -164,16 +165,17 @@ const RoomTypeTab = ({ hotelId }) => {
         status: values.status,
         amenityIds: values.amenityIds || [],
       };
-
       formData.append("request", JSON.stringify(request));
 
-      const remainingImages = fileList
-        .filter((f) => f.url)
-        .map((f) => f.url.replace(BASE_URL, ""));
-      formData.append("remainingImages", JSON.stringify(remainingImages));
+      const remainingImageUrls = fileList
+        .filter(file => file.url && !file.originFileObj)
+        .map(file => file.url);
+      formData.append("remainingImages", JSON.stringify(remainingImageUrls));
 
-      fileList.forEach((f) => {
-        if (!f.url && f.originFileObj) formData.append("files", f.originFileObj);
+      fileList.forEach(file => {
+        if (file.originFileObj) {
+          formData.append("files", file.originFileObj);
+        }
       });
 
       const res = await updateRoomType(editingType.id, formData);
@@ -187,11 +189,13 @@ const RoomTypeTab = ({ hotelId }) => {
     } catch (error) {
       console.error(error);
       message.error("Error updating room type");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-
   const handleDelete = async (id) => {
+    // Giữ nguyên hàm này
     try {
       const result = await Swal.fire({
         title: "Are you sure?",
@@ -204,10 +208,7 @@ const RoomTypeTab = ({ hotelId }) => {
       });
 
       if (result.isConfirmed) {
-        console.log(id);
         const response = await deleteRoomType(id);
-        console.log(response);
-
         if (response != null && response != undefined) {
           await Swal.fire({
             title: "Deleted!",
@@ -235,8 +236,8 @@ const RoomTypeTab = ({ hotelId }) => {
     }
   };
 
-
   const columns = [
+    // Giữ nguyên columns
     {
       title: "Image",
       dataIndex: "images",
@@ -245,7 +246,7 @@ const RoomTypeTab = ({ hotelId }) => {
         <img
           src={
             imgs?.length
-              ? `${BASE_URL}${imgs[0]}`
+              ? `${imgs[0]}`
               : "https://via.placeholder.com/80x60?text=No+Image"
           }
           alt="room"
@@ -351,20 +352,21 @@ const RoomTypeTab = ({ hotelId }) => {
         bordered
       />
 
-      {/* Modal giữ nguyên */}
       <Modal
         title={editingType ? "Edit Room Type" : "Add Room Type"}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         onOk={editingType ? handleUpdateRoomType : handleCreateRoomType}
         width={700}
+        okButtonProps={{ loading: isSubmitting }} // Thêm prop này
+        destroyOnClose // Thêm prop này để tự reset form
       >
-
         <Form
           form={form}
           layout="vertical"
           initialValues={{ status: "ACTIVE", capacity: 2 }}
         >
+          {/* Các Form.Item giữ nguyên */}
           <Form.Item
             name="name"
             label="Room Type Name"

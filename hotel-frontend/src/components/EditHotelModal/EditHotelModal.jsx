@@ -115,12 +115,13 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
           </Form.Item>
 
           <Form.Item label="Status" name="status">
-            <Select>
+            <Select disabled={form.getFieldValue("status") === "PENDING"}>
               <Option value="ACTIVE">Active</Option>
-              <Option value="PENDING">Pending</Option>
+              {/* <Option value="PENDING">Pending</Option> Có thể bỏ nếu user không được đổi */}
               <Option value="CLOSED">Closed</Option>
             </Select>
           </Form.Item>
+
 
           <Form.Item label="Images">
             <Upload

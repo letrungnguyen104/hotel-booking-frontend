@@ -1,62 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { Select, Card, Button, Tag, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import { getRoomsByHotel } from "@/service/roomService";
+import { getRoomTypesByHotel } from "@/service/roomTypeService";
 
 const RoomTab = ({ hotelId }) => {
   const [rooms, setRooms] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [filterType, setFilterType] = useState(null);
-  const mockRooms = [
-    {
-      id: 1,
-      name: "Deluxe Room 101",
-      floor: 1,
-      roomType: "Deluxe",
-      capacity: 2,
-      price: 80,
-      status: "AVAILABLE",
-    },
-    {
-      id: 2,
-      name: "Standard Room 102",
-      floor: 1,
-      roomType: "Standard",
-      capacity: 2,
-      price: 50,
-      status: "OCCUPIED",
-    },
-    {
-      id: 3,
-      name: "Family Suite 201",
-      floor: 2,
-      roomType: "Suite",
-      capacity: 4,
-      price: 120,
-      status: "AVAILABLE",
-    },
-    {
-      id: 4,
-      name: "Single Room 103",
-      floor: 1,
-      roomType: "Single",
-      capacity: 1,
-      price: 40,
-      status: "MAINTENANCE",
-    },
-  ];
 
   useEffect(() => {
-    try {
-      setRooms(mockRooms);
-      setRoomTypes([...new Set(mockRooms.map((r) => r.roomType))]);
-    } catch (err) {
-      console.error(err);
-      message.error("Failed to load rooms");
-    }
+    const fetchData = async () => {
+      try {
+        const [roomData, roomTypeData] = await Promise.all([
+          getRoomsByHotel(hotelId),
+          getRoomTypesByHotel(hotelId)
+        ]);
+
+        setRooms(roomData);
+        setRoomTypes(roomTypeData.map(rt => rt.name));
+      } catch (err) {
+        console.error(err);
+        message.error("Failed to load rooms or room types");
+      }
+    };
+
+    fetchData();
   }, [hotelId]);
 
   const filteredRooms = filterType
-    ? rooms.filter((r) => r.roomType === filterType)
+    ? rooms.filter(r => r.roomTypeName === filterType)
     : rooms;
 
   return (
@@ -65,9 +38,9 @@ const RoomTab = ({ hotelId }) => {
         <Select
           placeholder="Filter by Room Type"
           style={{ width: 200 }}
-          onChange={(value) => setFilterType(value)}
+          onChange={setFilterType}
           allowClear
-          options={roomTypes.map((type) => ({ label: type, value: type }))}
+          options={roomTypes.map(type => ({ label: type, value: type }))}
         />
         <Button type="primary" icon={<PlusOutlined />}>
           Add Room
@@ -75,16 +48,16 @@ const RoomTab = ({ hotelId }) => {
       </div>
 
       <div className="grid grid-cols-4 gap-4">
-        {filteredRooms.map((room) => (
+        {filteredRooms.map(room => (
           <Card
             key={room.id}
-            title={room.name}
+            title={`Room ${room.roomNumber}`}
             extra={
               <Tag
                 color={
                   room.status === "AVAILABLE"
                     ? "green"
-                    : room.status === "OCCUPIED"
+                    : room.status === "BOOKED"
                       ? "red"
                       : "orange"
                 }
@@ -93,23 +66,13 @@ const RoomTab = ({ hotelId }) => {
               </Tag>
             }
           >
-            <p>
-              <strong>Floor:</strong> {room.floor}
-            </p>
-            <p>
-              <strong>Type:</strong> {room.roomType}
-            </p>
-            <p>
-              <strong>Capacity:</strong> {room.capacity} persons
-            </p>
-            <p>
-              <strong>Price:</strong> ${room.price}
-            </p>
+            <p><strong>Floor:</strong> {room.floor}</p>
+            <p><strong>Type:</strong> {room.roomTypeName}</p>
+            <p><strong>Capacity:</strong> {room.capacity} persons</p>
+            <p><strong>Price:</strong> ${room.pricePerNight}</p>
             <div className="mt-2 flex gap-2">
               <Button size="small">Edit</Button>
-              <Button size="small" danger>
-                Delete
-              </Button>
+              <Button size="small" danger>Delete</Button>
             </div>
           </Card>
         ))}

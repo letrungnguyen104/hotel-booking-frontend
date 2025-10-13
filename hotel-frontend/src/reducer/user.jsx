@@ -1,7 +1,10 @@
 // src/reducers/user.js
 const storedUser = localStorage.getItem("userDetails");
 
-const initialState = storedUser ? JSON.parse(storedUser) : null;
+const initialState =
+  storedUser && storedUser !== 'undefined'
+    ? JSON.parse(storedUser)
+    : null;
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {

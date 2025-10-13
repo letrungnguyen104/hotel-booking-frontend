@@ -12,6 +12,7 @@ import HotelManagement from "@/pages/HotelAdmin/HotelManagement/HotelManagement"
 import BookingManagement from "@/pages/HotelAdmin/BookingManagement/BookingManagement";
 import RoomTypeManagement from "@/pages/HotelAdmin/RoomTypeManagement/RoomTypeManagement";
 import AdminHotelDetail from "../pages/HotelDetailManagement/AdminHotelDetail/AdminHotelDetail";
+import ProfilePage from "@/pages/ProfilePage/ProfilePage";
 
 // Cấu hình routes cho ứng dụng
 export const route = [
@@ -38,6 +39,10 @@ export const route = [
       {
         path: "offers",
         element: <DDpage />,
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />,
       },
       {
         path: "hotel-admin-dashboard",
@@ -69,21 +74,21 @@ export const route = [
   },
 ];
 
-const AppRouter = () => {
-  return (
-    <Router>
-      <Routes>
-        {route.map((route, index) => (
-          <Route
-            key={index}
-            path={route.path}
-            element={route.element}
-            children={route.children}
-          />
-        ))}
-      </Routes>
-    </Router>
-  );
-};
+// const AppRouter = () => {
+//   return (
+//     <Router>
+//       <Routes>
+//         {route.map((route, index) => (
+//           <Route
+//             key={index}
+//             path={route.path}
+//             element={route.element}
+//             children={route.children}
+//           />
+//         ))}
+//       </Routes>
+//     </Router>
+//   );
+// };
 
-export default AppRouter;
+// export default AppRouter;

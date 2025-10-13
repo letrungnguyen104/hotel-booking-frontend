@@ -141,11 +141,14 @@ function Header() {
     dispatch(checkLogin(false));
     dispatch(clearUser());
     toast.info("You have been logged out!");
+    navigate("/");
   };
 
   const handleMenuClick = ({ key }) => {
     if (key === "5") {
       handleLogout();
+    } else if (key === "2") {
+      navigate("/profile");
     } else if (key === "3" && isHotelAdmin) {
       navigate("/hotel-admin-dashboard");
     }
@@ -187,12 +190,12 @@ function Header() {
             <div className="header__notify">
               <Notify />
             </div>
-            <p className="header__name">Hi! {userDetails.username}</p>
+            <p className="header__name">{userDetails.fullName || userDetails.username}</p>
             <Dropdown menu={{ items, onClick: handleMenuClick }}>
               <a onClick={(e) => e.preventDefault()}>
                 <Space>
                   <img
-                    src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                    src={userDetails.imagePath || "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"}
                     alt="avatar"
                     className="header__avatar"
                   />

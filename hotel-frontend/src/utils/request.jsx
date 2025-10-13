@@ -43,6 +43,20 @@ export const del = async (path) => {
   return result;
 };
 
+export const put = async (path, data) => {
+  const response = await fetch(API_DOMAIN + path, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify(data)
+  });
+  const result = await response.json();
+  return result;
+};
+
 export const patch = async (path, data) => {
   const response = await fetch(API_DOMAIN + path, {
     method: "PATCH",

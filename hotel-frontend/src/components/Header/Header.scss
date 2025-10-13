@@ -103,6 +103,7 @@
       height: 40px;
       border-radius: 50%;
       cursor: pointer;
+      object-fit: cover;
       transition: transform 0.2s ease;
 
       &:hover {
@@ -110,6 +111,12 @@
       }
     }
   }
+}
+
+.ant-dropdown-trigger {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 @media (max-width: 768px) {

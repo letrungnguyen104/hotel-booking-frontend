@@ -10,7 +10,7 @@ function Logout() {
   useEffect(() => {
     removeToken();
     dispatch(checkLogin(false));
-    navigate("/login");
+    navigate("/");
   }, []);
   return (
     <>

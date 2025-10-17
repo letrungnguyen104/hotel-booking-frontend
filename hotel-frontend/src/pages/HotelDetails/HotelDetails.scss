@@ -1,4 +1,4 @@
-// HotelDetails SCSS - Phong cách chuyên nghiệp, đơn giản và tinh tế
+// src/pages/HotelDetails/HotelDetails.scss
 
 .hotel-detail {
   max-width: 1200px;
@@ -8,265 +8,209 @@
   color: #333;
   line-height: 1.6;
 
-  // Tiêu đề chính
   h1 {
     font-size: 32px;
     font-weight: 600;
     color: #1a1a1a;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 12px;
   }
 
-  // Nội dung khách sạn
-  .hotel-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 40px;
+  h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+}
 
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
+.hotel-detail-loading,
+.hotel-detail-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  flex-direction: column;
+}
+
+.hotel-rating-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+
+  .review-summary {
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.hotel-location {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 24px;
+}
+
+.gallery-section {
+  margin-bottom: 40px;
+
+  .main-image-wrapper,
+  .thumb-image-wrapper {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+
+    .ant-image {
+      height: 100%;
     }
 
-    .hotel-image {
-      img {
-        width: 100%;
-        height: 400px;
-        object-fit: cover;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-    }
-
-    .hotel-info {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-
-      .location-section {
-        p {
-          font-size: 16px;
-          color: #555;
-
-          b {
-            color: #333;
-            font-weight: 600;
-          }
-        }
-      }
-
-      .price-section {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex-wrap: wrap;
-
-        .current-price {
-          font-size: 32px;
-          font-weight: 700;
-          color: #2c5282;
-        }
-
-        .old-price {
-          font-size: 18px;
-          color: #999;
-          text-decoration: line-through;
-        }
-
-        .discount-badge {
-          background-color: #e53e3e;
-          color: white;
-          padding: 6px 12px;
-          border-radius: 4px;
-          font-size: 14px;
-          font-weight: 600;
-        }
-      }
-
-      .rating-section {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        .score {
-          background-color: #2c5282;
-          color: white;
-          font-size: 24px;
-          font-weight: 700;
-          padding: 10px 16px;
-          border-radius: 6px;
-        }
-
-        .review-text {
-          font-size: 18px;
-          font-weight: 600;
-          color: #333;
-        }
-
-        .review-count {
-          font-size: 14px;
-          color: #666;
-        }
-      }
+    .ant-image-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
   }
 
-  // Các section
-  .description-section,
-  .amenities-section,
-  .gallery-section,
-  .rooms-section {
-    margin-bottom: 40px;
+  .main-image-wrapper {
+    height: 408px;
+  }
 
-    h3 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #1a1a1a;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #e0e0e0;
-      text-align: center;
-    }
+  .thumb-image-wrapper {
+    height: 200px;
+  }
+}
 
-    p {
-      font-size: 16px;
+.description-section {
+  margin-bottom: 40px;
+
+  p {
+    font-size: 16px;
+    color: #555;
+    line-height: 1.8;
+  }
+}
+
+.rooms-section {
+  margin-bottom: 40px;
+}
+
+.room-card-customer {
+  margin-bottom: 20px;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .room-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  &.disabled {
+    background-color: #f5f5f5;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  h4 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+  }
+
+  .amenities-list {
+    margin-top: 12px;
+
+    .amenity-tag {
+      display: inline-block;
+      margin-right: 12px;
+      margin-bottom: 8px;
       color: #555;
-      line-height: 1.8;
-    }
-  }
 
-  // Tiện nghi
-  .amenities-section {
-    .amenities-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-
-      .amenity-tag {
-        background-color: #f7fafc;
-        border: 1px solid #e2e8f0;
-        padding: 10px 16px;
-        border-radius: 6px;
-        font-size: 14px;
-        color: #2d3748;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background-color: #edf2f7;
-          border-color: #cbd5e0;
-        }
+      .anticon {
+        color: #28a745;
+        margin-right: 4px;
       }
     }
   }
 
-  // Thư viện ảnh
-  .gallery-section {
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-
-      img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 6px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-        &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-      }
-    }
-  }
-
-  // Phòng
-  .rooms-section {
-    .room-card {
-      background-color: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 15px;
-      transition: box-shadow 0.3s ease;
-
-      &:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
-      h4 {
-        font-size: 20px;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 10px;
-      }
-
-      p {
-        font-size: 14px;
-        color: #666;
-        margin: 5px 0;
-      }
-
-      .booking-button {
-        background-color: #2c5282;
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 6px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        margin-top: 15px;
-        transition: background-color 0.3s ease;
-
-        &:hover {
-          background-color: #2a4365;
-        }
-
-        &:active {
-          transform: scale(0.98);
-        }
-      }
-    }
-  }
-
-  // Nút hành động
-  .action-buttons {
+  .booking-details {
+    text-align: right;
     display: flex;
-    gap: 15px;
-    margin-top: 20px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 12px;
+    height: 100%;
 
-    button {
-      padding: 12px 24px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: none;
+    .price-info {
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      width: 100%;
 
-      &.review-button {
-        background-color: #ffffff;
-        color: #2c5282;
-        border: 2px solid #2c5282;
-
-        &:hover {
-          background-color: #f7fafc;
-        }
+      .price-label {
+        font-size: 14px;
+        color: #777;
+        margin-right: 8px;
       }
 
-      &.book-button {
-        background-color: #2c5282;
-        color: white;
-
-        &:hover {
-          background-color: #2a4365;
-        }
+      .price-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #e53e3e;
       }
+
+      .price-suffix {
+        font-size: 14px;
+        color: #555;
+        margin-left: 4px;
+      }
+    }
+
+    .booking-button {
+      width: 100%;
+      margin-top: auto;
     }
   }
 }
 
+.hotel-detail__search-bar {
+  margin-bottom: 30px;
+
+  .search-component-wrapper {
+    background-color: transparent;
+    padding: 0;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+
+    .ant-form {
+      padding: 20px;
+    }
+
+    .ant-form-item {
+
+      .ant-select,
+      .ant-picker {
+        border: none;
+        box-shadow: none;
+
+        &:hover,
+        &:focus-within {
+          border-color: transparent !important;
+          box-shadow: none !important;
+        }
+      }
+
+      .ant-picker {
+        border: 1px solid rgb(215, 215, 215);
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { get, postFormData, putFormData, del } from "@/utils/request";
+import { get, postFormData, putFormData, del, post, put } from "@/utils/request";
 
 export const getRoomsByRoomType = async (roomTypeId) => {
   const response = await get(`room/room-type/${roomTypeId}`);
@@ -15,13 +15,13 @@ export const getRoomTypesByHotel = async (hotelId) => {
   return response.result;
 };
 
-export const createRoom = async (formData) => {
-  const response = await postFormData(`room`, formData);
+export const createRoom = async (data) => {
+  const response = await post('room', data);
   return response.result;
 };
 
-export const updateRoom = async (roomId, formData) => {
-  const response = await putFormData(`room/${roomId}`, formData);
+export const updateRoom = async (roomId, data) => {
+  const response = await put(`room/${roomId}`, data);
   return response.result;
 };
 

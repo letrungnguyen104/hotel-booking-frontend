@@ -1,7 +1,6 @@
 // publicRequest.jsx
 const API_DOMAIN = `http://localhost:8081/`;
 
-// Không dùng getAuthHeaders vì đây là public API
 export const getPublic = async (path) => {
   const response = await fetch(API_DOMAIN + path);
   const result = await response.json();
@@ -43,7 +42,7 @@ export const patchPublic = async (path, data) => {
 export const postFormDataPublic = async (path, formData) => {
   const response = await fetch(API_DOMAIN + path, {
     method: "POST",
-    body: formData, // browser tự set Content-Type
+    body: formData,
   });
   return await response.json();
 };
@@ -51,7 +50,7 @@ export const postFormDataPublic = async (path, formData) => {
 export const patchFormDataPublic = async (path, formData) => {
   const response = await fetch(API_DOMAIN + path, {
     method: "PATCH",
-    body: formData, // browser tự set Content-Type
+    body: formData,
   });
   return await response.json();
 };

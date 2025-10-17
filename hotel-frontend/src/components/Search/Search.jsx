@@ -1,59 +1,85 @@
-import { Button, Col, DatePicker, Dropdown, Input, Row, Space } from 'antd'
-import "./Search.scss"
-import { DownOutlined, SearchOutlined } from "@ant-design/icons";
+// src/components/Search/Search.jsx
+
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Form, Row, Col, AutoComplete, DatePicker, Select, Button } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import { setSearchParams } from '@/action/search';
+import { getProvinces } from '@/service/locationService';
+import "./Search.scss";
 
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 const Search = () => {
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const searchState = useSelector(state => state.searchReducer);
 
-  const items = [
-    { key: "1", label: "1 Adult" },
-    { key: "2", label: "2 Adults" },
-    { key: "3", label: "3 Adults" },
-  ];
+  const [provinces, setProvinces] = useState([]);
+  const [options, setOptions] = useState([]);
+
+  useEffect(() => {
+    getProvinces().then(data => {
+      if (data) setProvinces(data);
+    });
+  }, []);
+
+  useEffect(() => {
+    form.setFieldsValue({
+      address: searchState.address,
+      dates: searchState.dates?.[0] ? [dayjs(searchState.dates[0]), dayjs(searchState.dates[1])] : null,
+      guests: searchState.guests,
+    });
+  }, [searchState, form]);
+
+  const handleSearch = (searchText) => {
+    if (!searchText) {
+      setOptions([]);
+    } else {
+      const filtered = provinces.filter(p =>
+        p.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .includes(searchText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+      );
+      setOptions(filtered.map(p => ({ value: p.name })));
+    }
+  };
+
+  const onFinish = (values) => {
+    const { address, dates, guests } = values;
+    dispatch(setSearchParams({ address, dates, guests }));
+  };
 
   return (
-    <div className='search'>
-      <Row gutter={[20, 20]}>
-        <Col xxl={8} xl={8}>
-          <Input
-            className="search__input"
-            prefix={<SearchOutlined className="form__icon" />}
-            placeholder="Search location..."
+    <div className='search-component-wrapper'>
+      <Form form={form} onFinish={onFinish} layout="inline">
+        <Form.Item name="address" className="search-item search-item--location">
+          <AutoComplete
+            options={options}
+            onSearch={handleSearch}
+            placeholder="Where are you going?"
           />
-        </Col>
-        <Col xxl={8} xl={8}>
-          <RangePicker
-            placeholder={["Check in", "Check out"]}
-            format="DD-MM-YYYY"
-            className="search__picker"
-          />
-        </Col>
-        <Col xxl={4} xl={4}>
-          <Dropdown
-            menu={{
-              items,
-              selectable: true,
-              defaultSelectedKeys: ["3"],
-            }}
-            trigger={["click"]}
-          >
-            <div className="search__dropdown">
-              <Space>
-                Number of People
-                <DownOutlined />
-              </Space>
-            </div>
-          </Dropdown>
-        </Col>
-        <Col xxl={4} xl={4}>
-          <Button className="search__button" type="primary" icon={<SearchOutlined />} onClick={() => navigate("/search")}>
+        </Form.Item>
+        <Form.Item name="dates" className="search-item">
+          <RangePicker format="DD-MM-YYYY" />
+        </Form.Item>
+        <Form.Item name="guests" className="search-item">
+          <Select placeholder="Number of guests">
+            <Option value={1}>1 Adult</Option>
+            <Option value={2}>2 Adults</Option>
+            <Option value={3}>3 Adults</Option>
+            <Option value={4}>4 Adults</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item className="search-item">
+          <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
             Search
           </Button>
-        </Col>
-      </Row>
+        </Form.Item>
+      </Form>
     </div>
-  )
-}
+  );
+};
 
-export default Search
+export default Search;

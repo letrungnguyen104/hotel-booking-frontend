@@ -1,7 +1,7 @@
 // src/pages/ProfilePage/ProfilePage.jsx
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Card, Form, Input, Button, Upload, Avatar, Row, Col, Spin, Modal, Result } from 'antd';
+import { Card, Form, Input, Button, Upload, Avatar, Row, Col, Spin, Modal, Result, Select } from 'antd';
 import { UserOutlined, UploadOutlined, SolutionOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { updateUserProfile, changeMyPassword } from '@/service/userService';
 import { getMyBusinessProfile, updateMyBusinessProfile, createMyBusinessProfile, checkMyBusinessProfileStatus } from '@/service/hotelAdminService';
@@ -9,6 +9,7 @@ import { setUser } from '@/action/user';
 import { toast } from 'sonner';
 import './ProfilePage.scss';
 import { useNavigate } from 'react-router-dom';
+import { getProvinces } from '@/service/locationService';
 
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -29,6 +30,7 @@ const ProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [provinces, setProvinces] = useState([]);
   const [fileList, setFileList] = useState([]);
   const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
   const [isSubmittingBusiness, setIsSubmittingBusiness] = useState(false);
@@ -56,6 +58,12 @@ const ProfilePage = () => {
         fullName: userDetails.fullName,
         phoneNumber: userDetails.phoneNumber,
         address: userDetails.address,
+      });
+
+      getProvinces().then(data => {
+        if (data) {
+          setProvinces(data.map(p => ({ value: p.name, label: p.name })));
+        }
       });
 
       setLoadingBusiness(true);
@@ -120,7 +128,6 @@ const ProfilePage = () => {
     }
   };
 
-  // HÀM MỚI ĐỂ XỬ LÝ ĐĂNG KÝ BUSINESS
   const handleBusinessRegister = async (values) => {
     setIsSubmittingRegistration(true);
     try {
@@ -147,6 +154,10 @@ const ProfilePage = () => {
     setPreviewImage(file.url || file.preview);
     setPreviewOpen(true);
   };
+
+  const filterProvinces = (input, option) =>
+    (option?.label ?? '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .includes(input.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
 
   if (!userDetails) {
     return <Spin tip="Loading user details..." fullscreen />;
@@ -198,7 +209,14 @@ const ProfilePage = () => {
                   <Form.Item name="fullName" label="Full Name"><Input /></Form.Item>
                   <Form.Item label="Email"><Input value={userDetails.email} disabled /></Form.Item>
                   <Form.Item name="phoneNumber" label="Phone Number"><Input /></Form.Item>
-                  <Form.Item name="address" label="Address"><Input /></Form.Item>
+                  <Form.Item name="address" label="Address (Province/City)">
+                    <Select
+                      showSearch
+                      placeholder="Select or search for your province"
+                      options={provinces}
+                      filterOption={filterProvinces}
+                    />
+                  </Form.Item>
                 </div>
                 <div>
                   <Form.Item><Button type="primary" htmlType="submit" loading={isSubmittingProfile} block>Save Changes</Button></Form.Item>
@@ -217,7 +235,14 @@ const ProfilePage = () => {
                   <Row gutter={16}>
                     <Col span={12}><Form.Item name="businessName" label="Business Name"><Input /></Form.Item></Col>
                     <Col span={12}><Form.Item name="taxCode" label="Tax Code"><Input /></Form.Item></Col>
-                    <Col span={24}><Form.Item name="businessAddress" label="Business Address"><Input /></Form.Item></Col>
+                    <Col span={24}><Form.Item name="businessAddress" label="Business Address (Province/City)">
+                      <Select
+                        showSearch
+                        placeholder="Select or search for your province"
+                        options={provinces}
+                        filterOption={filterProvinces}
+                      />
+                    </Form.Item></Col>
                     <Col span={12}><Form.Item name="licenseNumber" label="License Number"><Input /></Form.Item></Col>
                     <Col span={12}><Form.Item name="idCardOrPassport" label="ID Card/Passport"><Input /></Form.Item></Col>
                     <Col span={24}><Form.Item name="bankAccount" label="Bank Account"><Input /></Form.Item></Col>

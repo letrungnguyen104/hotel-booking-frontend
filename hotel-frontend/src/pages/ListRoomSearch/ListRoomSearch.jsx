@@ -1,270 +1,182 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import "./ListRoomSearch.scss";
+// src/pages/ListRoomSearch/ListRoomSearch.jsx
+import React, { useEffect, useState, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Card, Rate, Slider, Tag, Spin, Result, Pagination, Collapse, Checkbox, Space } from 'antd';
+import { EnvironmentOutlined } from '@ant-design/icons';
+import { searchHotels } from '@/service/hotelService';
 import Search from '@/components/Search/Search';
-import { Card, Rate, Slider, Tag } from 'antd';
-import { EnvironmentOutlined } from '@ant-design/icons'
+import "./ListRoomSearch.scss";
+import { useSelector } from 'react-redux';
+import dayjs from 'dayjs';
 
-const roomList = [
-  {
-    id: 1,
-    name: "Golden Lotus Grand Da Nang",
-    location: "Phước Mỹ, Da Nang - 2.5 km to center",
-    price: "₫1,454,250",
-    oldPrice: "₫4,539,555",
-    discount: "-69%",
-    rating: 5,
-    score: 9.3,
-    review: "Exceptional",
-    reviewCount: 7327,
-    offers: ["Breakfast", "Free fitness center access", "World Tourism Day Sale"],
-    image:
-      "https://pix8.agoda.net/hotelImages/63227000/0/bb9bcb3b36fa90f9c77276bd89f883ae.jpg?ce=0&s=375x",
-  },
-  {
-    id: 2,
-    name: "Cordial Grand Hotel",
-    location: "An Hai Bac, Da Nang - 1.7 km to center",
-    price: "₫505,172",
-    oldPrice: "₫1,550,000",
-    discount: "-67%",
-    rating: 4,
-    score: 8.4,
-    review: "Excellent",
-    reviewCount: 2031,
-    offers: ["Breakfast", "Sea View", "Domestic Deal"],
-    image:
-      "https://pix8.agoda.net/hotelImages/64896973/0/ea760dc311d7749c106a56a6044e9760.jpeg?ce=0&s=375x",
-  },
-  {
-    id: 3,
-    name: "Muong Thanh Luxury Da Nang hotel",
-    location: "Phuoc My, Da Nang - 2.5 km to center",
-    price: "₫899,000",
-    oldPrice: "₫1,800,000",
-    discount: "-50%",
-    rating: 4,
-    score: 8.7,
-    review: "Very Good",
-    reviewCount: 4120,
-    offers: ["Breakfast", "Swimming Pool", "Free Wi-Fi"],
-    image:
-      "https://pix8.agoda.net/hotelImages/219/2190907/2190907_17080417080054905485.jpg?ca=6&ce=1&s=375x",
-  },
-  {
-    id: 4,
-    name: "Da Nang Central Luxury Hotel",
-    location: "Hai Chau, Da Nang - 1 km to Dragon Bridge",
-    price: "₫1,250,000",
-    oldPrice: "₫2,500,000",
-    discount: "-50%",
-    rating: 5,
-    score: 9.0,
-    review: "Superb",
-    reviewCount: 2950,
-    offers: ["Free cancellation", "Gym", "Spa service"],
-    image:
-      "https://pix8.agoda.net/hotelImages/33985059/-1/77afd0c92c0bdee0d86e7bcf09b38d49.jpg?ce=0&s=208x117&ar=16x9",
-  },
-  {
-    id: 5,
-    name: "Ocean View Boutique Hotel",
-    location: "Son Tra, Da Nang - 3 km to city center",
-    price: "₫620,000",
-    oldPrice: "₫1,200,000",
-    discount: "-48%",
-    rating: 3,
-    score: 7.9,
-    review: "Good",
-    reviewCount: 1765,
-    offers: ["Breakfast", "Near Beach", "Airport Shuttle"],
-    image:
-      "https://pix8.agoda.net/property/33985059/856131796/d7ef0d1e446f99a4baba959fb13bae76.jpeg?ce=0&s=208x117&ar=16x9",
-  },
-  {
-    id: 6,
-    name: "Melia Vinpearl Danang Riverfront",
-    location: "An Hai Bac, Da Nang - 0.4 km to center",
-    price: "₫770,000",
-    oldPrice: "₫1,400,000",
-    discount: "-45%",
-    rating: 4,
-    score: 8.1,
-    review: "Very Good",
-    reviewCount: 2209,
-    offers: ["Breakfast included", "Free parking", "Rooftop Bar"],
-    image:
-      "https://pix8.agoda.net/hotelImages/4947690/-1/f5dd1db7b2125faf6a1210227979f529.jpg?ce=0&s=1024x",
-  },
-  {
-    id: 7,
-    name: "Palm Garden Resort Da Nang",
-    location: "Non Nuoc Beach, Da Nang - 5 km to Marble Mountains",
-    price: "₫2,050,000",
-    oldPrice: "₫3,800,000",
-    discount: "-46%",
-    rating: 5,
-    score: 9.1,
-    review: "Wonderful",
-    reviewCount: 3810,
-    offers: ["Private beach", "Spa", "Family friendly"],
-    image:
-      "https://pix8.agoda.net/hotelImages/33985059/-1/69c240730e90112a2afc26aa668014a4.jpg?ce=0&s=208x117&ar=16x9",
-  },
-];
+const { Panel } = Collapse;
 
 const ListRoomSearch = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const searchState = useSelector(state => state.searchReducer);
 
-  const handleHotelClick = (room) => {
-    console.log("Clicked room:", room);
-    // Điều hướng đến trang chi tiết khách sạn với ID tương ứng
-    navigate(`/hotel/${room.id}`);
+  const [originalHotels, setOriginalHotels] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [filters, setFilters] = useState({
+    priceRange: [0, 10000000],
+    starRating: [],
+    amenities: [],
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
+  useEffect(() => {
+    const { address, guests, dates } = searchState;
+    if (address && guests && dates && dates[0] && dates[1]) {
+      const params = {
+        address,
+        guests,
+        checkIn: dayjs(dates[0]).format('YYYY-MM-DD'),
+        checkOut: dayjs(dates[1]).format('YYYY-MM-DD'),
+      };
+      setLoading(true);
+      searchHotels(params)
+        .then(data => setOriginalHotels(data || []))
+        .catch(err => {
+          console.error("Failed to search hotels:", err);
+          setOriginalHotels([]);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [searchState]);
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1);
+  };
+
+  const filteredHotels = useMemo(() => {
+    return originalHotels.filter(hotel => {
+      const priceCondition = hotel.newPrice >= filters.priceRange[0] && hotel.newPrice <= filters.priceRange[1];
+      const starCondition = filters.starRating.length === 0 || filters.starRating.includes(Math.round(hotel.stars));
+      const amenitiesCondition = filters.amenities.length === 0 || filters.amenities.every(amenity => hotel.amenities?.includes(amenity));
+      return priceCondition && starCondition && amenitiesCondition;
+    });
+  }, [originalHotels, filters]);
+
+  const paginatedHotels = filteredHotels.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  const handleHotelClick = (hotel) => {
+    navigate(`/hotel/${hotel.id}`);
+  };
+
+  console.log(originalHotels);
+
+  const renderHotelList = () => {
+    if (loading) {
+      return <div className="flex justify-center items-center h-96"><Spin size="large" /></div>;
+    }
+    if (filteredHotels.length === 0) {
+      return <Result status="info" title="No Hotels Found" subTitle="Try adjusting your filters or search criteria." />;
+    }
+    return (
+      <div className="hotel-list">
+        {paginatedHotels.map((hotel) => (
+          <Card key={hotel.id} className="hotel-card" hoverable onClick={() => handleHotelClick(hotel)}>
+            <div className="hotel-card__left">
+              <img src={hotel.image || "https://via.placeholder.com/375x250?text=No+Image"} alt={hotel.name} />
+              {hotel.stars > 0 && <span className="hotel-card__score">{hotel.stars?.toFixed(1)}</span>}
+            </div>
+            <div className="hotel-card__right">
+              <div className="hotel-card__header">
+                <h3 className="hotel-card__title">{hotel.name}</h3>
+                {hotel.stars > 0 && <div className="hotel-card__rating"><Rate disabled allowHalf value={hotel.stars} /></div>}
+              </div>
+              <div className="hotel-card__location"><EnvironmentOutlined /> {hotel.address}</div>
+              <div className="hotel-card__offers">
+                {hotel.amenities?.split(',').slice(0, 3).map((amenity, idx) => ( // Chỉ hiện 3 tiện nghi đầu
+                  <Tag key={idx} color="blue">{amenity.trim()}</Tag>
+                ))}
+              </div>
+              <div className="hotel-card__footer">
+                <div className="hotel-card__price">
+                  {hotel.oldPrice && <span className="old-price">{hotel.oldPrice.toLocaleString()} ₫</span>}
+                  <span className="new-price">{hotel.newPrice.toLocaleString()} ₫</span>
+                </div>
+                <div className="hotel-card__review">
+                  <p className="review-count">{hotel.reviewCount} reviews</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
   };
 
   return (
     <>
-      <div className="search-bar">
-        <Search />
-      </div>
-
+      <div className="search-bar"><Search /></div>
       <div className="main-content">
-        {/* Sidebar trái (bộ lọc) */}
         <aside className="sidebar">
-          <h3 className="sidebar-title">Hotels</h3>
-
-          {/* Budget */}
-          <div className="filter-group">
-            <h4>Budget (per night)</h4>
-            <Slider range defaultValue={[300000, 5000000]} min={0} max={5000000} step={50000} />
-            <div className="price-inputs">
-              <input type="number" defaultValue={300000} /> -{" "}
-              <input type="number" defaultValue={5000000} />
-            </div>
-            <p className="price-range">300.000 ₫ - 5.000.000 ₫</p>
-          </div>
-
-          {/* Giá mỗi đêm */}
-          <div className="filter-group">
-            <h4>Budget (per night)</h4>
-            <label><input type="checkbox" /> Dưới 500.000 ₫</label>
-            <label><input type="checkbox" /> 500.000 ₫ - 1.000.000 ₫</label>
-            <label><input type="checkbox" /> 1.000.000 ₫ - 2.000.000 ₫</label>
-            <label><input type="checkbox" /> 2.000.000 ₫ - 5.000.000 ₫</label>
-            <label><input type="checkbox" /> Trên 5.000.000 ₫</label>
-          </div>
-
-          {/* Hạng sao */}
-          <div className="filter-group">
-            <h4>Rating</h4>
-            <label><Rate disabled defaultValue={5} /></label>
-            <label><Rate disabled defaultValue={4} /></label>
-            <label><Rate disabled defaultValue={3} /></label>
-          </div>
-
-          {/* Tiện nghi */}
-          <div className="filter-group">
-            <h4></h4>
-            <label><input type="checkbox" /> Free Wi-Fi</label>
-            <label><input type="checkbox" /> Pool</label>
-            <label><input type="checkbox" /> Restaurant</label>
-          </div>
-
-          {/* Vị trí */}
-          <div className="filter-group">
-            <h4>Location</h4>
-            <label><input type="checkbox" /> My Khe Beach</label>
-            <label><input type="checkbox" /> Han River</label>
-            <label><input type="checkbox" /> Downtown</label>
-          </div>
-
-          {/* Đánh giá */}
-          <div className="filter-group">
-            <h4>Evaluate</h4>
-            <label><input type="checkbox" /> Excellent (8+)</label>
-            <label><input type="checkbox" /> Very good (8+)</label>
-            <label><input type="checkbox" /> Good (7+)</label>
-          </div>
+          <h3 className="sidebar-title">Filter by</h3>
+          <Collapse defaultActiveKey={['1', '2', '3']} ghost>
+            <Panel header="Price per night" key="1">
+              <Slider
+                range
+                value={filters.priceRange}
+                min={0}
+                max={10000000}
+                step={100000}
+                onChange={(value) => handleFilterChange('priceRange', value)}
+                tooltip={{ formatter: (value) => `${value.toLocaleString()} ₫` }}
+              />
+              <div className="price-display">
+                {filters.priceRange[0].toLocaleString()} ₫ - {filters.priceRange[1].toLocaleString()} ₫
+              </div>
+            </Panel>
+            <Panel header="Star rating" key="2">
+              <Checkbox.Group
+                style={{ width: '100%' }}
+                value={filters.starRating}
+                onChange={(value) => handleFilterChange('starRating', value)}
+              >
+                <Space direction="vertical">
+                  <Checkbox value={5}><Rate disabled defaultValue={5} /></Checkbox>
+                  <Checkbox value={4}><Rate disabled defaultValue={4} /></Checkbox>
+                  <Checkbox value={3}><Rate disabled defaultValue={3} /></Checkbox>
+                  <Checkbox value={2}><Rate disabled defaultValue={2} /></Checkbox>
+                  <Checkbox value={1}><Rate disabled defaultValue={1} /></Checkbox>
+                </Space>
+              </Checkbox.Group>
+            </Panel>
+            <Panel header="Amenities" key="3">
+              <Checkbox.Group
+                style={{ width: '100%' }}
+                options={['WiFi', 'Pool', 'Restaurant', 'Parking', 'Spa', 'Fitness Center']}
+                value={filters.amenities}
+                onChange={(value) => handleFilterChange('amenities', value)}
+              />
+            </Panel>
+          </Collapse>
         </aside>
-
-        {/* Phần chính giữa */}
         <section className="hotel-list-section">
           <div className="list-header">
-            <h2>Search Results</h2>
-            <div className="sort-box">
-              <label>Sort:</label>
-              <select>
-                <option value="popular">Most Popular</option>
-                <option value="priceLow">Lowest Price</option>
-                <option value="priceHigh">Highest Price</option>
-                <option value="rating">Highest Rating</option>
-              </select>
+            <h2>{filteredHotels.length} properties found</h2>
+            {/* Sort box giữ nguyên */}
+          </div>
+          {renderHotelList()}
+          {filteredHotels.length > pageSize && (
+            <div className="pagination">
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={filteredHotels.length}
+                onChange={(page) => setCurrentPage(page)}
+                showSizeChanger={false}
+              />
             </div>
-          </div>
-
-          <div className="hotel-list">
-            {roomList.map((room) => (
-              <Card
-                key={room.id}
-                className="hotel-card"
-                hoverable
-                onClick={() => handleHotelClick(room)}
-                style={{ cursor: "pointer" }}
-              >
-                {/* Bên trái: ảnh */}
-                <div className="hotel-card__left">
-                  <img src={room.image} alt={room.name} />
-                  <span className="hotel-card__score">{room.score}</span>
-                </div>
-
-                {/* Bên phải: thông tin */}
-                <div className="hotel-card__right">
-                  <div className="hotel-card__header">
-                    <h3 className="hotel-card__title">{room.name}</h3>
-                    <div className="hotel-card__rating">
-                      <Rate disabled defaultValue={room.rating} />
-                    </div>
-                  </div>
-
-                  <div className="hotel-card__location">
-                    <EnvironmentOutlined /> {room.location}
-                  </div>
-
-                  <div className="hotel-card__offers">
-                    {room.offers.map((offer, idx) => (
-                      <Tag key={idx} color="blue">
-                        {offer}
-                      </Tag>
-                    ))}
-                  </div>
-
-                  <div className="hotel-card__footer">
-                    <div className="hotel-card__price">
-                      <span className="old-price">{room.oldPrice}</span>
-                      <span className="new-price">{room.price}</span>
-                      <span className="discount">{room.discount}</span>
-                      <p className="free-cancel">+ FREE CANCELLATION</p>
-                    </div>
-
-                    <div className="hotel-card__review">
-                      <span className="score-box">{room.score}</span>
-                      <span className="review-text">{room.review}</span>
-                      <p className="review-count">{room.reviewCount} reviews</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {/* Phân trang */}
-          <div className="pagination">
-            <button className="page-btn">{'<'}</button>
-            <button className="page-btn active">1</button>
-            <button className="page-btn">2</button>
-            <button className="page-btn">3</button>
-            <button className="page-btn">{'>'}</button>
-          </div>
+          )}
         </section>
       </div>
     </>

@@ -28,3 +28,9 @@ export const updateHotel = async (id, formData) => {
   const response = await putFormData(`hotels/update/${id}`, formData);
   return response.result;
 };
+
+export const searchHotels = async (params) => {
+  const queryString = new URLSearchParams(params).toString();
+  const response = await get(`hotels/search?${queryString}`);
+  return response.result;
+};

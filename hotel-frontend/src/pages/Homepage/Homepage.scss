@@ -2,7 +2,10 @@
   font-family: "Poppins", sans-serif;
 }
 
-.ant-input {
+.ant-input,
+.ant-select-selection-item,
+.ant-picker-input input,
+.ant-select-selection-placeholder {
   font-family: "Poppins", sans-serif;
 }
 
@@ -26,10 +29,6 @@
       z-index: -1;
     }
   }
-
-  .homepage-content {
-    padding: 40px 20px;
-  }
 }
 
 .form {
@@ -37,7 +36,7 @@
   width: 1100px;
   max-width: 1100px;
   height: max-content;
-  padding: 30px 0px;
+  padding: 30px 0;
 
   &__main {
     padding: 20px 20px;
@@ -45,16 +44,6 @@
     text-align: center;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     border-radius: 12px;
-  }
-
-  &__search {
-    padding: 20px 10px;
-    margin-bottom: 20px;
-  }
-
-  &__icon {
-    font-size: 18px;
-    color: #bcbcbc;
   }
 
   &__title {
@@ -72,34 +61,59 @@
     }
   }
 
-  &__date {
-    padding: 20px 10px;
-    width: 100%;
-  }
+  &__search-wrapper {
+    position: relative;
+    margin-bottom: 20px;
 
-  &__dropdown {
-    width: 100%;
-    padding: 20px 10px;
-    border: 1px solid #d9d9d9;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #c0c0c0;
+    .ant-form-item {
+      margin-bottom: 0;
+    }
 
-    &:hover {
-      border-color: #40a9ff;
-      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    .form__icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 16px;
     }
   }
 
+  .ant-select,
+  .ant-picker,
+  .ant-input-number {
+    width: 100% !important;
+    height: 60px !important;
+    font-size: 16px !important;
+    border-radius: 6px !important;
+  }
+
+  .ant-select-selector {
+    height: 100% !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .ant-picker {
+    padding: 0 16px !important;
+  }
+
+  &__search-wrapper .ant-select-selection-search-input {
+    padding-left: 25px !important;
+  }
+
+  &__search-wrapper .ant-select-selection-placeholder {
+    padding-left: 25px !important;
+  }
+
+
   &__button {
-    padding: 30px 80px;
-    margin-left: auto;
-    margin-right: auto;
+    height: 60px;
+    font-size: 18px;
+    width: 100%;
+    margin-top: 10px;
   }
 }
 

@@ -3,6 +3,7 @@ import { Modal, Form, Input, Select, Upload, Button, Spin, message } from "antd"
 import { UploadOutlined } from "@ant-design/icons";
 import { getHotelById, updateHotel } from "@/service/hotelService";
 import { toast } from "sonner";
+import { getProvinces } from "@/service/locationService";
 
 const { Option } = Select;
 
@@ -11,10 +12,16 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [provinces, setProvinces] = useState([]);
 
   useEffect(() => {
     if (open && hotelId) {
       fetchHotelData();
+      getProvinces().then(data => {
+        if (data) {
+          setProvinces(data.map(p => ({ value: p.name, label: p.name })));
+        }
+      });
     } else if (!open) {
       form.resetFields();
       setFileList([]);
@@ -86,6 +93,10 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
     }
   };
 
+  const filterProvinces = (input, option) =>
+    (option?.label ?? '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .includes(input.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+
   return (
     <Modal
       open={open}
@@ -102,13 +113,17 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
         </div>
       ) : (
         <Form form={form} layout="vertical">
-          {/* Các Form.Item giữ nguyên... */}
           <Form.Item label="Hotel Name" name="name" rules={[{ required: true }]}>
             <Input placeholder="Enter hotel name" />
           </Form.Item>
 
-          <Form.Item label="Address" name="address">
-            <Input placeholder="Enter address" />
+          <Form.Item name="address" label="Address (Province/City)">
+            <Select
+              showSearch
+              placeholder="Select or search for your province"
+              options={provinces}
+              filterOption={filterProvinces}
+            />
           </Form.Item>
 
           <Form.Item label="City" name="city">

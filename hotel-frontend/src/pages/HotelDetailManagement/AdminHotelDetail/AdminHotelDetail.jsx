@@ -4,8 +4,10 @@ import { Card, Tabs, Carousel, Spin, Tag, Rate, Descriptions, Button, message } 
 import { getHotelById } from "@/service/hotelService";
 import "./AdminHotelDetail.scss";
 import RoomTypeTab from "../RoomTypeTab/RoomTypeTab";
-import RoomTab from "../RoomTab.jsx/RoomTab";
+import RoomTab from "../RoomTab/RoomTab";
 import EditHotelModal from "@/components/EditHotelModal/EditHotelModal";
+import SpecialPriceTab from "../SpecialTab/SpecialTab";
+import ServiceTab from "../ServiceTab/ServiceTab";
 
 const { TabPane } = Tabs;
 
@@ -40,6 +42,29 @@ const HotelDetail = () => {
     );
 
   if (!hotel) return <p>No hotel found</p>;
+
+  const tabItems = [
+    {
+      key: "1",
+      label: "Room Types",
+      children: <RoomTypeTab hotelId={id} />,
+    },
+    {
+      key: "2",
+      label: "Rooms",
+      children: <RoomTab hotelId={id} />,
+    },
+    {
+      key: "3",
+      label: "Special Prices",
+      children: <SpecialPriceTab hotelId={id} />,
+    },
+    {
+      key: "4",
+      label: "Services",
+      children: <ServiceTab hotelId={id} />
+    },
+  ];
 
   return (
     <div className="hotel-detail">
@@ -88,18 +113,7 @@ const HotelDetail = () => {
       <div className="hotel-tabs mt-6">
         <Tabs
           defaultActiveKey="1"
-          items={[
-            {
-              key: "1",
-              label: "Room Types",
-              children: <RoomTypeTab hotelId={id} />,
-            },
-            {
-              key: "2",
-              label: "Rooms",
-              children: <RoomTab hotelId={id} />,
-            },
-          ]}
+          items={tabItems}
         />
       </div>
 

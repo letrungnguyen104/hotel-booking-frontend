@@ -1,0 +1,74 @@
+// src/pages/HotelAdmin/Dashboard/Dashboard.scss
+
+.dashboard-container {
+  padding: 24px;
+  background-color: #f0f2f5;
+
+  .ant-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    height: 100%; // Giúp các card trên cùng 1 hàng có chiều cao bằng nhau
+
+    .ant-card-head-title {
+      font-weight: 600;
+    }
+  }
+
+  .dashboard-header-card {
+    height: auto; // Reset height cho card header
+
+    .ant-card-body {
+      padding: 0 !important;
+    }
+  }
+
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .filter-label {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.65);
+    margin-right: 8px;
+  }
+
+  .ant-statistic-title {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  .ant-statistic-content {
+    font-size: 24px;
+  }
+
+  .ant-statistic-content-prefix {
+    font-size: 20px;
+    margin-right: 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-title {
+    margin-bottom: 16px;
+  }
+}

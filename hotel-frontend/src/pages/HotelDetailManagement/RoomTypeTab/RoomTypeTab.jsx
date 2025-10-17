@@ -22,7 +22,7 @@ import {
   UserOutlined,
   FilterOutlined,
 } from "@ant-design/icons";
-import { getRoomTypesByHotel } from "@/service/roomTypeService";
+import { getRoomTypesByHotel, getRoomTypesByHotelForHotelAdmin } from "@/service/roomTypeService";
 import { getAmenities } from "@/service/amenityService";
 import "./RoomTypeTab.scss";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ const RoomTypeTab = ({ hotelId }) => {
   const fetchRoomTypes = async () => {
     setLoading(true);
     try {
-      const data = await getRoomTypesByHotel(hotelId);
+      const data = await getRoomTypesByHotelForHotelAdmin(hotelId);
       const reversed = (data || []).reverse();
       setRoomTypes(reversed);
       setFilteredTypes(reversed);

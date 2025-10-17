@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LayoutDefault from "../layout/LayoutDefault";
-import ListRoomSearch from "../pages/ListRoomSearch/ListRoomSearch";
 import HotelDetail from "../pages/HotelDetails/HotelDetail";
 import Homepage from "../pages/Homepage/Homepage";
 import Contactpage from "../pages/ContactUS/Contactpage";
@@ -13,8 +12,8 @@ import BookingManagement from "@/pages/HotelAdmin/BookingManagement/BookingManag
 import RoomTypeManagement from "@/pages/HotelAdmin/RoomTypeManagement/RoomTypeManagement";
 import AdminHotelDetail from "../pages/HotelDetailManagement/AdminHotelDetail/AdminHotelDetail";
 import ProfilePage from "@/pages/ProfilePage/ProfilePage";
+import ListRoomSearch from "../pages/ListRoomSearch/ListRoomSearch"
 
-// Cấu hình routes cho ứng dụng
 export const route = [
   {
     path: "/",
@@ -74,21 +73,3 @@ export const route = [
   },
 ];
 
-// const AppRouter = () => {
-//   return (
-//     <Router>
-//       <Routes>
-//         {route.map((route, index) => (
-//           <Route
-//             key={index}
-//             path={route.path}
-//             element={route.element}
-//             children={route.children}
-//           />
-//         ))}
-//       </Routes>
-//     </Router>
-//   );
-// };
-
-// export default AppRouter;

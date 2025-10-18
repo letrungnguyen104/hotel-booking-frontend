@@ -13,6 +13,7 @@ import RoomTypeManagement from "@/pages/HotelAdmin/RoomTypeManagement/RoomTypeMa
 import AdminHotelDetail from "../pages/HotelDetailManagement/AdminHotelDetail/AdminHotelDetail";
 import ProfilePage from "@/pages/ProfilePage/ProfilePage";
 import ListRoomSearch from "../pages/ListRoomSearch/ListRoomSearch"
+import CheckoutPage from "@/pages/CheckoutPage/CheckoutPage";
 
 export const route = [
   {
@@ -42,6 +43,10 @@ export const route = [
       {
         path: "profile",
         element: <ProfilePage />,
+      },
+      {
+        path: "checkout",
+        element: <CheckoutPage />,
       },
       {
         path: "hotel-admin-dashboard",

@@ -1,5 +1,4 @@
 // src/pages/HotelDetails/HotelDetails.scss
-
 .hotel-detail {
   max-width: 1200px;
   margin: 0 auto;
@@ -53,14 +52,22 @@
   margin-bottom: 24px;
 }
 
+
 .gallery-section {
   margin-bottom: 40px;
+
+  .gallery-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
 
   .main-image-wrapper,
   .thumb-image-wrapper {
     width: 100%;
     overflow: hidden;
     border-radius: 8px;
+    height: 100%;
 
     .ant-image {
       height: 100%;
@@ -70,15 +77,75 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
     }
   }
 
-  .main-image-wrapper {
-    height: 408px;
+  @media (min-width: 768px) {
+
+    // breakpoint md
+    .main-image-wrapper {
+      height: 416px;
+    }
   }
 
-  .thumb-image-wrapper {
-    height: 200px;
+
+  .sub-images-row {
+
+    .ant-col {
+      height: 200px;
+
+      @media (min-width: 768px) {
+        height: 200px;
+      }
+    }
+
+    .thumb-image-wrapper {
+      height: 100%;
+    }
+
+    .ant-col:nth-child(1) .thumb-image-wrapper {
+      border-top-left-radius: 8px;
+
+      @media (max-width: 767px) {
+        border-top-right-radius: 8px;
+      }
+    }
+
+    .ant-col:nth-child(2) .thumb-image-wrapper {
+      border-top-right-radius: 8px;
+
+      @media (min-width: 768px) {
+        border-top-left-radius: 0;
+      }
+    }
+
+    .ant-col:nth-child(3) .thumb-image-wrapper {
+      border-bottom-left-radius: 8px;
+
+      @media (max-width: 767px) {
+        border-bottom-right-radius: 8px;
+      }
+    }
+
+    .ant-col:nth-child(4) .thumb-image-wrapper {
+      border-bottom-right-radius: 8px;
+
+      @media (min-width: 768px) {
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+
+  .placeholder-image {
+    background-color: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .ant-image-img {
+      opacity: 0.5;
+    }
   }
 }
 
@@ -172,6 +239,19 @@
         color: #555;
         margin-left: 4px;
       }
+
+      .old-price {
+        display: block;
+        font-size: 14px;
+        color: #999;
+        text-decoration: line-through;
+      }
+
+      .price-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: #e53e3e;
+      }
     }
 
     .booking-button {
@@ -187,7 +267,7 @@
   .search-component-wrapper {
     background-color: transparent;
     padding: 0;
-    border: 1px solid #d9d9d9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 
     .ant-form {
@@ -210,6 +290,162 @@
 
       .ant-picker {
         border: 1px solid rgb(215, 215, 215);
+      }
+    }
+  }
+}
+
+.room-selection-panel {
+  display: flex; // 1. Bật Flexbox
+  flex-direction: column; // Xếp theo chiều dọc
+  min-height: 250px; // Đặt chiều cao tối thiểu để nút bị đẩy xuống
+
+  background-color: #fafbfd;
+  border: 1px solid #e8e8e8;
+  border-top: none;
+  padding: 24px;
+  margin-top: -21px;
+  margin-bottom: 20px;
+  border-radius: 0 0 8px 8px;
+
+  h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d395a;
+    margin-bottom: 16px;
+  }
+
+  // Phần chứa các checkbox
+  .services-checkbox-group {
+    flex-grow: 1; // 2. Cho phép phần này dãn ra, đẩy nút xuống
+
+    .ant-space-item {
+      width: 100%;
+    }
+
+    .ant-checkbox-wrapper {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row-reverse;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background-color: #fff;
+      border: 1px solid #e8e8e8;
+      transition: all 0.3s ease;
+
+      &:not(:last-child) {
+        margin-bottom: 12px;
+      }
+
+      &:hover {
+        border-color: #1677ff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .service-price {
+        font-weight: 600;
+        color: #1677ff;
+      }
+    }
+  }
+
+  .panel-loading {
+    text-align: center;
+    padding: 20px;
+  }
+
+  // 3. Nút "Add to Booking" sẽ tự động nằm ở dưới cùng
+  .ant-btn {
+    margin-top: 16px;
+  }
+}
+
+.booking-summary-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  color: #fff;
+  border-top: 1px solid #4a4a4a;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.15);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  transition: all 0.3s ease;
+
+  @media (min-width: 1200px) {
+    width: 1200px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 12px 12px 0 0;
+    padding: 20px 32px;
+  }
+
+  .summary-details {
+    h4 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fafafa;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        font-size: 14px;
+        color: #d9d9d9;
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px; // Thêm khoảng cách giữa các item
+
+        .ant-btn {
+          padding: 0 0 0 8px;
+          height: auto;
+          font-size: 12px;
+          color: #ff7875;
+
+          &:hover {
+            color: #f5222d;
+          }
+        }
+
+        // ✅ STYLE MỚI CHO DANH SÁCH DỊCH VỤ
+        .summary-services {
+          display: block;
+          font-size: 12px;
+          color: #999;
+          padding-left: 21px; // Thẳng hàng với "1 x Room"
+        }
+      }
+    }
+  }
+
+  .summary-action {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .total-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .ant-btn-primary {
+      background: #1677ff;
+      border: none;
+      box-shadow: 0 4px 10px rgba(22, 119, 255, 0.3);
+
+      &:hover {
+        background: #4096ff;
       }
     }
   }

@@ -1,7 +1,7 @@
 // src/pages/ListRoomSearch/ListRoomSearch.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card, Rate, Slider, Tag, Spin, Result, Pagination, Collapse, Checkbox, Space } from 'antd';
+import { Card, Rate, Slider, Tag, Spin, Result, Pagination, Collapse, Checkbox, Space, Row, Col } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { searchHotels } from '@/service/hotelService';
 import Search from '@/components/Search/Search';
@@ -83,31 +83,50 @@ const ListRoomSearch = () => {
       <div className="hotel-list">
         {paginatedHotels.map((hotel) => (
           <Card key={hotel.id} className="hotel-card" hoverable onClick={() => handleHotelClick(hotel)}>
-            <div className="hotel-card__left">
-              <img src={hotel.image || "https://via.placeholder.com/375x250?text=No+Image"} alt={hotel.name} />
-              {hotel.stars > 0 && <span className="hotel-card__score">{hotel.stars?.toFixed(1)}</span>}
-            </div>
-            <div className="hotel-card__right">
-              <div className="hotel-card__header">
-                <h3 className="hotel-card__title">{hotel.name}</h3>
-                {hotel.stars > 0 && <div className="hotel-card__rating"><Rate disabled allowHalf value={hotel.stars} /></div>}
-              </div>
-              <div className="hotel-card__location"><EnvironmentOutlined /> {hotel.address}</div>
-              <div className="hotel-card__offers">
-                {hotel.amenities?.split(',').slice(0, 3).map((amenity, idx) => ( // Chỉ hiện 3 tiện nghi đầu
-                  <Tag key={idx} color="blue">{amenity.trim()}</Tag>
-                ))}
-              </div>
-              <div className="hotel-card__footer">
-                <div className="hotel-card__price">
-                  {hotel.oldPrice && <span className="old-price">{hotel.oldPrice.toLocaleString()} ₫</span>}
-                  <span className="new-price">{hotel.newPrice.toLocaleString()} ₫</span>
+            <Row gutter={[24, 24]} align="middle">
+              <Col xs={24} md={8}>
+                <div className="hotel-card__left">
+                  <img src={hotel.image || "https://via.placeholder.com/375x250?text=No+Image"} alt={hotel.name} />
+                  {hotel.stars > 0 && <span className="hotel-card__score">{hotel.stars?.toFixed(1)}</span>}
                 </div>
-                <div className="hotel-card__review">
-                  <p className="review-count">{hotel.reviewCount} reviews</p>
+              </Col>
+
+              <Col xs={24} md={10}>
+                <div className="hotel-card__middle">
+                  <div className="hotel-card__header">
+                    <h3 className="hotel-card__title">{hotel.name}</h3>
+                    {hotel.stars > 0 && (
+                      <div className="hotel-card__rating">
+                        <Rate disabled allowHalf value={hotel.stars} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="hotel-card__location">
+                    <EnvironmentOutlined /> {hotel.address}
+                  </div>
+                  <div className="hotel-card__offers">
+                    {hotel.amenities?.split(',').slice(0, 3).map((amenity, idx) => (
+                      <Tag key={idx} color="blue">{amenity.trim()}</Tag>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </Col>
+
+              <Col xs={24} md={6}>
+                <div className="hotel-card__right">
+                  <div className="hotel-card__review">
+                    <span>{hotel.reviewCount} reviews</span>
+                  </div>
+                  <div className="hotel-card__price">
+                    {hotel.oldPrice && hotel.oldPrice > hotel.newPrice && (
+                      <span className="old-price">{hotel.oldPrice.toLocaleString()} ₫</span>
+                    )}
+                    <span className="new-price">{hotel.newPrice.toLocaleString()} ₫</span>
+                  </div>
+                </div>
+              </Col>
+            </Row>
+
           </Card>
         ))}
       </div>
@@ -163,7 +182,6 @@ const ListRoomSearch = () => {
         <section className="hotel-list-section">
           <div className="list-header">
             <h2>{filteredHotels.length} properties found</h2>
-            {/* Sort box giữ nguyên */}
           </div>
           {renderHotelList()}
           {filteredHotels.length > pageSize && (

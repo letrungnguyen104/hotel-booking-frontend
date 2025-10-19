@@ -1,20 +1,18 @@
 // src/pages/HotelDetails/HotelDetail.jsx
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Spin, Tag, Rate, Image, Button, Row, Col, Empty, Checkbox, message, Space } from "antd"; // Import Space
+import { Card, Spin, Tag, Rate, Image, Button, Row, Col, Empty, Checkbox, message, Space } from "antd";
 import { EnvironmentOutlined, CheckCircleOutlined } from "@ant-design/icons";
 import { getHotelById } from "@/service/hotelService";
-import { getAvailableRoomTypes, getRoomTypesByHotel } from "@/service/roomTypeService"; // Import cả hai
+import { getAvailableRoomTypes, getRoomTypesByHotel } from "@/service/roomTypeService";
 import { getServicesByHotel } from "@/service/serviceService";
 import Search from "@/components/Search/Search";
 import "./HotelDetails.scss";
 import { toast } from "sonner";
 import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
-// --- Component Panel chọn Dịch vụ ---
 const RoomSelectionPanel = ({ roomType, hotelId, onAddToCart }) => {
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);

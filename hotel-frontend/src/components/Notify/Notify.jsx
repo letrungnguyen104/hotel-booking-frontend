@@ -117,15 +117,16 @@ function Notify() {
           Mark all as read
         </Button>
       </div>
-      <div className="notify__body">
-        {loading ? (
-          <div className="notify-loading"><Spin /></div>
-        ) : items.length > 0 ? (
-          <Menu items={items} />
-        ) : (
-          <Empty description="No notifications" />
-        )}
-      </div>
+      {loading ? (
+        <div className="notify-loading"><Spin /></div>
+      ) : items.length > 0 ? (
+        <Menu
+          items={items}
+          className="notify__menu-list"
+        />
+      ) : (
+        <Empty className="notify-empty" description="No notifications" />
+      )}
     </div>
   );
 

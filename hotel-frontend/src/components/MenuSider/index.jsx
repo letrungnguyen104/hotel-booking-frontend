@@ -31,8 +31,8 @@ function MenuSider() {
       <Menu
         mode="inline"
         items={items}
-        defaultSelectedKeys={["Default"]}
-        defaultOpenKeys={["Dashboard"]}
+        defaultSelectedKeys={["dashboard"]}
+        defaultOpenKeys={["dashboard"]}
       />
     </>
   )

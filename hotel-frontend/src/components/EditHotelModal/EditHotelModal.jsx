@@ -1,5 +1,6 @@
+// src/components/EditHotelModal/EditHotelModal.jsx
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, Upload, Button, Spin, message } from "antd";
+import { Modal, Form, Input, Select, Upload, Button, Spin, message, Alert } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { getHotelById, updateHotel } from "@/service/hotelService";
 import { toast } from "sonner";
@@ -13,25 +14,29 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [provinces, setProvinces] = useState([]);
+  const [currentStatus, setCurrentStatus] = useState(null);
 
   useEffect(() => {
     if (open && hotelId) {
-      fetchHotelData();
-      getProvinces().then(data => {
-        if (data) {
-          setProvinces(data.map(p => ({ value: p.name, label: p.name })));
-        }
-      });
+      fetchHotelData(hotelId);
     } else if (!open) {
       form.resetFields();
       setFileList([]);
+      setCurrentStatus(null);
     }
   }, [open, hotelId]);
 
-  const fetchHotelData = async () => {
+  const fetchHotelData = async (id) => {
     setLoading(true);
     try {
-      const hotel = await getHotelById(hotelId);
+      const [hotel, provinceData] = await Promise.all([
+        getHotelById(id),
+        getProvinces()
+      ]);
+      if (provinceData) {
+        setProvinces(provinceData.map(p => ({ value: p.name, label: p.name })));
+      }
+
       form.setFieldsValue({
         name: hotel.name,
         address: hotel.address,
@@ -41,6 +46,8 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
         description: hotel.description,
         status: hotel.status,
       });
+
+      setCurrentStatus(hotel.status);
 
       if (hotel.images && hotel.images.length > 0) {
         setFileList(
@@ -87,11 +94,16 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
       onClose();
     } catch (err) {
       console.error("Error updating hotel:", err);
-      toast.error("Failed to update hotel!");
+      toast.error(err.response?.data?.message || "Failed to update hotel!");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const isStatusChangeForbidden =
+    currentStatus === "PENDING" ||
+    currentStatus === "REJECTED" ||
+    currentStatus === "INACTIVE";
 
   const filterProvinces = (input, option) =>
     (option?.label ?? '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -106,6 +118,7 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
       okText="Save Changes"
       width={600}
       okButtonProps={{ loading: isSubmitting }}
+      destroyOnClose
     >
       {loading ? (
         <div className="flex justify-center items-center h-60">
@@ -113,6 +126,16 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
         </div>
       ) : (
         <Form form={form} layout="vertical">
+          {isStatusChangeForbidden && (
+            <Alert
+              message="This hotel's status cannot be changed."
+              description="Only a Super Admin can reactivate a PENDING, REJECTED, or BANNED (INACTIVE) hotel."
+              type="warning"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
+
           <Form.Item label="Hotel Name" name="name" rules={[{ required: true }]}>
             <Input placeholder="Enter hotel name" />
           </Form.Item>
@@ -143,9 +166,12 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
           </Form.Item>
 
           <Form.Item label="Status" name="status">
-            <Select disabled={form.getFieldValue("status") === "PENDING"}>
-              <Option value="ACTIVE">Active</Option>
-              <Option value="CLOSED">Closed</Option>
+            <Select disabled={isStatusChangeForbidden}>
+              <Option value="ACTIVE">Active (Available for booking)</Option>
+              <Option value="CLOSED">Closed (Temporarily unavailable)</Option>
+              {isStatusChangeForbidden && (
+                <Option value={currentStatus} disabled>{currentStatus}</Option>
+              )}
             </Select>
           </Form.Item>
 

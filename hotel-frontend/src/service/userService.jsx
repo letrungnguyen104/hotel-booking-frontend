@@ -1,5 +1,5 @@
 import { postPublic } from "@/utils/publicRequest";
-import { get, put, putFormData } from "@/utils/request"
+import { del, get, post, put, putFormData } from "@/utils/request"
 
 export const getUserById = async (userId) => {
   const response = await get(`users/get-user/${userId}`);
@@ -29,4 +29,24 @@ export const updateUserProfile = async (formData) => {
 export const changeMyPassword = async (data) => {
   const response = await put('users/my-profile/change-password', data);
   return response;
+};
+
+export const getAllUsers = async () => {
+  const response = await get('users/get-all');
+  return response.result;
+};
+
+export const adminCreateUser = async (data) => {
+  const response = await post('users/admin', data);
+  return response.result;
+};
+
+export const adminUpdateUser = async (id, data) => {
+  const response = await put(`users/admin/${id}`, data);
+  return response.result;
+};
+
+export const adminDeleteUser = async (id) => {
+  const response = await del(`users/admin/${id}`);
+  return response.result;
 };

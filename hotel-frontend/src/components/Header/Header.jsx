@@ -83,6 +83,14 @@ function Header() {
         dispatch(setUser(userPrf));
         setLoadingUser(false);
         setIsLoginModalOpen(false);
+
+        const isAdmin = userPrf?.roles?.some(role => role.roleName === 'ADMIN');
+
+        if (isAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
         toast.error("Login failed!");
       }

@@ -6,6 +6,7 @@ import { getToken } from '@/service/tokenService';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink, Outlet, useNavigate } from 'react-router'
+import './LayoutDefault.scss'
 
 const LayoutDefault = () => {
   const navigate = useNavigate();

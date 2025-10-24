@@ -1,6 +1,8 @@
-import { NavLink, useNavigate } from "react-router";
+// src/components/Header/Header.jsx
+
+import { NavLink, useNavigate } from "react-router-dom";
 import "./Header.scss";
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, MessageOutlined } from "@ant-design/icons";
 import { Dropdown, Space, Modal, Form, Input, Button } from "antd";
 import Notify from "../Notify/Notify";
 import { useEffect, useState } from "react";
@@ -29,19 +31,32 @@ function Header() {
   const isLogin = useSelector((state) => state.loginReducer);
   const userDetails = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
+
   const isHotelAdmin = userDetails?.roles?.some(
     (role) => role.roleName === "HOTEL_ADMIN"
   );
+  const isAdmin = userDetails?.roles?.some(
+    (role) => role.roleName === "ADMIN"
+  );
+  const isRegularUser = isLogin && !isAdmin && !isHotelAdmin;
   const items = [
     { key: "1", label: "My Account", disabled: true },
     { type: "divider" },
     { key: "2", label: "Profile" },
-    isHotelAdmin
-      ? { key: "3", label: "Hotel Management" }
-      : { key: "3", label: "Hotel business registration" },
-    { key: "4", label: "Billing" },
-    { key: "5", label: "Log out", icon: <LogoutOutlined /> },
   ];
+
+  if (isHotelAdmin) {
+    items.push({ key: "3", label: "Hotel Management" });
+  } else if (isAdmin) {
+    items.push({ key: "7", label: "Admin Dashboard" });
+  } else if (isRegularUser) {
+    items.push({ key: "3", label: "Hotel business registration" });
+    items.push({ key: "6", label: "My Chats", icon: <MessageOutlined /> });
+  }
+
+  items.push({ key: "4", label: "Billing" });
+  items.push({ key: "5", label: "Log out", icon: <LogoutOutlined /> });
+
 
   useEffect(() => {
     const token = getToken();
@@ -66,7 +81,7 @@ function Header() {
       dispatch(clearUser());
       setLoadingUser(false);
     }
-  }, [dispatch]);
+  }, [dispatch, userDetails]);
 
   const handleLogin = async (values) => {
     try {
@@ -159,6 +174,13 @@ function Header() {
       navigate("/profile");
     } else if (key === "3" && isHotelAdmin) {
       navigate("/hotel-admin-dashboard");
+    } else if (key === "3" && isRegularUser) {
+      // Điều hướng đến trang profile để đăng ký
+      navigate("/profile");
+    } else if (key === "6" && isRegularUser) {
+      navigate("/chat");
+    } else if (key === "7" && isAdmin) {
+      navigate("/admin");
     }
   };
 
@@ -223,24 +245,20 @@ function Header() {
         )}
       </div>
 
-      {/* Login Modal */}
       <Modal title="Login" open={isLoginModalOpen} onCancel={() => setIsLoginModalOpen(false)} footer={null} centered>
         <Form form={loginForm} layout="vertical" onFinish={handleLogin}>
           <Form.Item label="Username" name="username" rules={[{ required: true, message: "Please enter your username" }]}>
             <Input placeholder="Enter your username" />
           </Form.Item>
-
           <Form.Item label="Password" name="password" rules={[{ required: true, message: "Please enter your password" }]}>
             <Input.Password placeholder="Enter your password" />
           </Form.Item>
-
           <Button type="primary" htmlType="submit" block>
             Login
           </Button>
         </Form>
       </Modal>
 
-      {/* Register Modal */}
       <Modal title="Register" open={isRegisterModalOpen} onCancel={() => setIsRegisterModalOpen(false)} footer={null} centered>
         <Form form={registerForm} layout="vertical" onFinish={handleRegister}>
           <Form.Item label="Username" name="username" rules={[{ required: true, message: "Please enter your username" }]}>
@@ -289,7 +307,7 @@ function Header() {
           </Button>
         </Form>
       </Modal>
-      {/* OTP Modal */}
+
       <Modal
         title="Email Verification"
         open={isOtpModalOpen}

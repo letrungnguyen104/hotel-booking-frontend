@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, Spin, Tag, Rate, Image, Button, Row, Col, Empty, Checkbox, message, Space } from "antd";
-import { EnvironmentOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { EnvironmentOutlined, CheckCircleOutlined, MessageOutlined } from "@ant-design/icons";
 import { getHotelById } from "@/service/hotelService";
 import { getAvailableRoomTypes, getRoomTypesByHotel } from "@/service/roomTypeService";
 import { getServicesByHotel } from "@/service/serviceService";
@@ -58,7 +58,6 @@ const RoomSelectionPanel = ({ roomType, hotelId, onAddToCart }) => {
   );
 };
 
-// --- Component Thanh Tóm tắt Đơn hàng (ĐÃ SỬA) ---
 const BookingSummary = ({ cart, onRemoveItem, onCheckout }) => {
   if (cart.length === 0) return null;
 
@@ -104,16 +103,15 @@ const BookingSummary = ({ cart, onRemoveItem, onCheckout }) => {
   );
 };
 
-// --- Component Chính ---
 const HotelDetail = () => {
-  const { id } = useParams(); // ID khách sạn từ URL (ví dụ: "1")
+  const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Lấy state từ Redux
   const searchState = useSelector(state => state.searchReducer);
   const checkoutData = useSelector(state => state.checkoutReducer);
-  const { cart: bookingCart, hotel: hotelInCart } = checkoutData; // Lấy giỏ hàng VÀ khách sạn trong giỏ hàng
+  const userDetails = useSelector(state => state.userReducer);
+  const { cart: bookingCart, hotel: hotelInCart } = checkoutData;
 
   const [hotel, setHotel] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
@@ -125,7 +123,7 @@ const HotelDetail = () => {
   const checkOut = searchState.dates?.[1] ? dayjs(searchState.dates[1]).format('YYYY-MM-DD') : null;
 
   useEffect(() => {
-    const hotelId = parseInt(id); // Chuyển ID từ URL sang số
+    const hotelId = parseInt(id);
     if (!hotelId) return;
 
     if (hotelInCart && hotelInCart.id !== hotelId) {
@@ -163,7 +161,6 @@ const HotelDetail = () => {
   };
 
   const handleAddToCart = (roomType, selectedServices) => {
-    // Kiểm tra xem người dùng có đang cố đặt phòng khi không có ngày không
     if (!checkIn || !checkOut) {
       toast.error("Please select your check-in and check-out dates in the search bar above before adding a room.");
       return;
@@ -202,6 +199,25 @@ const HotelDetail = () => {
     navigate('/checkout');
   };
 
+  const handleStartChat = () => {
+    if (!userDetails) {
+      toast.error("You must be logged in to chat.");
+      return;
+    }
+    dispatch({
+      type: 'START_CHAT_WITH',
+      payload: {
+        recipientId: hotel.owner.id,
+        recipientName: hotel.owner.username,
+        hotelId: hotel.id
+      }
+    });
+
+    navigate('/chat');
+  };
+
+  const isOwner = userDetails && userDetails.id === hotel.owner.id;
+
   return (
     <>
       <div className="hotel-detail">
@@ -218,7 +234,18 @@ const HotelDetail = () => {
             {hotel.status}
           </Tag>
         </div>
-        <p className="hotel-location"><EnvironmentOutlined /> {hotel.address}</p>
+        <div className="hotel-location-chat-wrapper">
+          <p className="hotel-location"><EnvironmentOutlined /> {hotel.address}</p>
+          {!isOwner && userDetails && (
+            <Button
+              className="chat-with-hotel-btn"
+              icon={<MessageOutlined />}
+              onClick={handleStartChat}
+            >
+              Chat with hotel
+            </Button>
+          )}
+        </div>
 
         <div className="gallery-section">
           <Image.PreviewGroup>
@@ -266,7 +293,6 @@ const HotelDetail = () => {
             const hasAvailabilityInfo = rt.availableRoomsCount !== undefined;
             const actualRoomsLeft = hasAvailabilityInfo ? rt.availableRoomsCount - roomsOfThisTypeInCart : 999;
 
-            // Cập nhật: Nếu không có ngày, vẫn cho phép chọn (isAvailable = true)
             const isAvailable = rt.status === 'ACTIVE' && (hasAvailabilityInfo ? actualRoomsLeft > 0 : true);
             const hasDiscount = rt.newPrice && rt.oldPrice && rt.newPrice < rt.oldPrice;
 
@@ -299,7 +325,6 @@ const HotelDetail = () => {
                         </Tag>
                       )}
                       {!isAvailable && <Tag color="red">Sold Out</Tag>}
-                      {/* Sửa lại: Nếu không có ngày, không hiển thị gì */}
                       {!hasAvailabilityInfo && isAvailable && (
                         <Tag color="blue">Press Search to check availability</Tag>
                       )}

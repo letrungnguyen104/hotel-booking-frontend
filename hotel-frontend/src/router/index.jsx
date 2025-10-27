@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // Layouts
 import LayoutDefault from "../layout/LayoutDefault";
 import HotelAdminDashboard from "@/pages/HotelAdminDashboard/HotelAdminDashboard";
-import LayoutAdmin from "@/layout/layoutAdmin/LayoutAdmin"; // Đảm bảo đường dẫn này đúng
+import LayoutAdmin from "@/layout/layoutAdmin/LayoutAdmin";
 
 // Pages (Customer)
 import Homepage from "../pages/Homepage/Homepage";
@@ -21,7 +21,6 @@ import CheckoutPage from "@/pages/CheckoutPage/CheckoutPage";
 import Dashboard from "@/pages/HotelAdmin/Dashboard/Dashboard";
 import HotelManagement from "@/pages/HotelAdmin/HotelManagement/HotelManagement";
 import BookingManagement from "@/pages/HotelAdmin/BookingManagement/BookingManagement";
-import RoomTypeManagement from "@/pages/HotelAdmin/RoomTypeManagement/RoomTypeManagement";
 import AdminHotelDetail from "../pages/HotelDetailManagement/AdminHotelDetail/AdminHotelDetail";
 import AdminDashboard from "@/components/Admin/AdminDashboard/AdminDashboard";
 import AdminUserManagement from "@/components/Admin/AdminUserManagement/AdminUserManagement";
@@ -30,11 +29,10 @@ import AdminReportManagement from "@/components/Admin/AdminReportManagement/Admi
 import AdminBusinessRegistrationManagement from "@/components/Admin/AdminBusinessRegistrationManagement/AdminBusinessRegistrationManagement";
 import AdminMessage from "@/components/Admin/AdminMessage/AdminMessage";
 import AdminNotification from "@/components/Admin/AdminNotification/AdminNotification";
+import Chat from "@/pages/HotelAdmin/Chat/Chat";
 
 
-// Cấu hình routes cho ứng dụng
 export const route = [
-  // --- Route cho Khách hàng ---
   {
     path: "/",
     element: <LayoutDefault />,
@@ -46,8 +44,8 @@ export const route = [
       { path: "offers", element: <DDpage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "checkout", element: <CheckoutPage /> },
+      { path: "chat", element: <Chat /> },
 
-      // --- Route cho Chủ khách sạn (Hotel Admin) ---
       {
         path: "hotel-admin-dashboard",
         element: <HotelAdminDashboard />,
@@ -56,14 +54,13 @@ export const route = [
           { path: "dashboard", element: <Dashboard /> },
           { path: "hotel-management", element: <HotelManagement /> },
           { path: "booking-management", element: <BookingManagement /> },
-          { path: "room-type-management", element: <RoomTypeManagement /> },
+          { path: "chat", element: <Chat /> },
           { path: "hotel/:id", element: <AdminHotelDetail /> },
         ]
       },
     ],
   },
 
-  // --- Route cho Super Admin ---
   {
     path: "/admin",
     element: <LayoutAdmin />,

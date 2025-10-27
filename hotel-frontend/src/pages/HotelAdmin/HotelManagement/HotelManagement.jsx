@@ -84,7 +84,6 @@ const HotelManagement = () => {
         </Button>
       </div>
 
-      {/* Bộ lọc */}
       <div className="filter">
         <div className="filter__title">Filter</div>
         <div className="filter__status">

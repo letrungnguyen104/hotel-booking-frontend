@@ -1,8 +1,7 @@
 // src/pages/Chat/Chat.scss
 @use "sass:color";
 
-// Biến màu (Bạn có thể thay đổi $primary-color để khớp với theme của admin)
-$primary-color: #1677ff; // Màu xanh antd
+$primary-color: #1677ff;
 $hover-color: #e6f4ff;
 $border-color: #eef2f6;
 $text-color: #333;
@@ -11,13 +10,12 @@ $background-light: #f8f9fa;
 
 .chat-layout {
   display: flex;
-  height: calc(100vh - 72.8px); // Chiều cao full trừ header admin
+  height: calc(100vh - 72.8px);
   background: #fff;
   font-family: "Poppins", sans-serif;
   border-top: 1px solid $border-color;
 }
 
-// --- Cột bên trái (Danh sách trò chuyện) ---
 .conversation-list {
   width: 320px;
   min-width: 280px;
@@ -68,6 +66,14 @@ $background-light: #f8f9fa;
 
     .convo-avatar {
       flex-shrink: 0;
+      position: relative;
+
+      .ant-badge-status-dot {
+        width: 10px;
+        height: 10px;
+        border: 2px solid #fff;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+      }
     }
 
     .convo-details {
@@ -79,16 +85,22 @@ $background-light: #f8f9fa;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
 
       .convo-name {
         font-weight: 600;
         color: $text-color;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .convo-timestamp {
         font-size: 0.75rem;
         color: $text-light;
         flex-shrink: 0;
+        white-space: nowrap;
       }
     }
 
@@ -133,7 +145,6 @@ $background-light: #f8f9fa;
   }
 }
 
-// --- Cửa sổ chat bên phải ---
 .chat-window {
   flex: 1;
   display: flex;
@@ -162,7 +173,14 @@ $background-light: #f8f9fa;
 
         span {
           font-size: 0.85rem;
-          color: #2ecc71;
+
+          &.online {
+            color: #2ecc71;
+          }
+
+          &.offline {
+            color: $text-light;
+          }
         }
       }
     }

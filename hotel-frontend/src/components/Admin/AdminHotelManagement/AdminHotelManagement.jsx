@@ -232,7 +232,7 @@ const AdminHotelManagement = () => {
           >
             <Option value="ALL">All Statuses</Option>
             <Option value="PENDING">Pending</Option>
-            <Option value-="ACTIVE">Active</Option>
+            <Option value="ACTIVE">Active</Option>
             <Option value="CLOSED">Closed</Option>
             <Option value="REJECTED">Rejected</Option>
             <Option value="INACTIVE">Banned</Option>

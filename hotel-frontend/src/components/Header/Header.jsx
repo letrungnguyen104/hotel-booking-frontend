@@ -1,8 +1,7 @@
 // src/components/Header/Header.jsx
-
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Header.scss";
-import { LogoutOutlined, MessageOutlined } from "@ant-design/icons";
+import { LogoutOutlined, MessageOutlined, CalendarOutlined } from "@ant-design/icons";
 import { Dropdown, Space, Modal, Form, Input, Button } from "antd";
 import Notify from "../Notify/Notify";
 import { useEffect, useState } from "react";
@@ -47,14 +46,15 @@ function Header() {
 
   if (isHotelAdmin) {
     items.push({ key: "3", label: "Hotel Management" });
+    items.push({ key: "8", label: "My Bookings", icon: <CalendarOutlined /> });
   } else if (isAdmin) {
     items.push({ key: "7", label: "Admin Dashboard" });
   } else if (isRegularUser) {
     items.push({ key: "3", label: "Hotel business registration" });
     items.push({ key: "6", label: "My Chats", icon: <MessageOutlined /> });
+    items.push({ key: "8", label: "My Bookings", icon: <CalendarOutlined /> });
   }
 
-  items.push({ key: "4", label: "Billing" });
   items.push({ key: "5", label: "Log out", icon: <LogoutOutlined /> });
 
 
@@ -168,19 +168,28 @@ function Header() {
   };
 
   const handleMenuClick = ({ key }) => {
-    if (key === "5") {
-      handleLogout();
-    } else if (key === "2") {
-      navigate("/profile");
-    } else if (key === "3" && isHotelAdmin) {
-      navigate("/hotel-admin-dashboard");
-    } else if (key === "3" && isRegularUser) {
-      // Điều hướng đến trang profile để đăng ký
-      navigate("/profile");
-    } else if (key === "6" && isRegularUser) {
-      navigate("/chat");
-    } else if (key === "7" && isAdmin) {
-      navigate("/admin");
+    switch (key) {
+      case "2":
+        navigate("/profile");
+        break;
+      case "3":
+        if (isHotelAdmin) navigate("/hotel-admin-dashboard");
+        if (isRegularUser) navigate("/profile");
+        break;
+      case "5":
+        handleLogout();
+        break;
+      case "6":
+        if (isRegularUser) navigate("/chat");
+        break;
+      case "7":
+        if (isAdmin) navigate("/admin");
+        break;
+      case "8":
+        navigate("/my-bookings");
+        break;
+      default:
+        break;
     }
   };
 

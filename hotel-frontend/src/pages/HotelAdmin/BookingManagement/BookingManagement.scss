@@ -1,0 +1,78 @@
+// src/pages/HotelAdmin/BookingManagement/BookingManagement.scss
+
+.booking-management-page {
+  .page-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .booking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .ant-card-body {
+    padding-top: 16px;
+  }
+
+  .ant-tabs-tab {
+    .anticon {
+      margin-right: 8px;
+    }
+  }
+
+  .ant-table-wrapper {
+    overflow-x: auto; // Giúp bảng responsive
+  }
+}
+
+// Style cho Modal chi tiết (tái sử dụng)
+.booking-detail-modal {
+  .ant-descriptions-item-label {
+    width: 120px;
+    font-weight: 600;
+  }
+
+  .ant-list-item-extra {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .price-breakdown {
+    margin-top: 16px;
+
+    h4 {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    p {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 8px;
+
+      strong {
+        color: #1a1a1a;
+        font-weight: 500;
+      }
+    }
+
+    .grand-total {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+
+      strong {
+        font-weight: 700;
+        color: #e53e3e;
+      }
+    }
+  }
+}

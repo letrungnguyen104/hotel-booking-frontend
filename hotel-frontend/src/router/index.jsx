@@ -1,5 +1,4 @@
 // src/router/index.jsx
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -30,6 +29,9 @@ import AdminBusinessRegistrationManagement from "@/components/Admin/AdminBusines
 import AdminMessage from "@/components/Admin/AdminMessage/AdminMessage";
 import AdminNotification from "@/components/Admin/AdminNotification/AdminNotification";
 import Chat from "@/pages/HotelAdmin/Chat/Chat";
+import BookingSuccessPage from "@/pages/BookingSuccessPage/BookingSuccessPage";
+import BookingFailurePage from "@/pages/BookingFailurePage/BookingFailurePage";
+import MyBookingsPage from "@/pages/MyBookingsPage/MyBookingsPage";
 
 
 export const route = [
@@ -44,6 +46,9 @@ export const route = [
       { path: "offers", element: <DDpage /> },
       { path: "profile", element: <ProfilePage /> },
       { path: "checkout", element: <CheckoutPage /> },
+      { path: "booking-success", element: <BookingSuccessPage /> },
+      { path: "booking-failure", element: <BookingFailurePage /> },
+      { path: "my-bookings", element: <MyBookingsPage /> },
       { path: "chat", element: <Chat /> },
 
       {

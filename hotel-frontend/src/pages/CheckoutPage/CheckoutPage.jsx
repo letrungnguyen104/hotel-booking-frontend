@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { toast } from 'sonner';
 // import { createBooking } from '@/service/bookingService'; // Bạn sẽ cần tạo service này
 import './CheckoutPage.scss';
+import { createBooking } from '@/service/bookingService';
 
 const { Step } = Steps;
 
@@ -74,7 +75,6 @@ const CheckoutPage = () => {
       }, {});
 
       const bookingRequest = {
-        userId: userDetails.id,
         hotelId: hotel.id,
         checkInDate: checkIn,
         checkOutDate: checkOut,
@@ -82,19 +82,18 @@ const CheckoutPage = () => {
         totalPrice: grandTotal,
         customerInfo: values
       };
-
       console.log("Booking Request Payload:", bookingRequest);
-
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      toast.success("Booking confirmed successfully!");
-
-      // Xóa giỏ hàng và chuyển hướng
-      dispatch({ type: 'CLEAR_CHECKOUT_DATA' });
-      navigate('/booking-success');
+      const response = await createBooking(bookingRequest);
+      if (response && response.paymentUrl) {
+        toast.success("Redirecting to payment gateway...");
+        dispatch({ type: 'CLEAR_CHECKOUT_DATA' });
+        window.location.href = response.paymentUrl;
+      } else {
+        toast.error("Could not create payment URL.");
+      }
 
     } catch (error) {
-      toast.error("Booking failed. Please try again.");
-    } finally {
+      toast.error(error.response?.data?.message || "Booking failed. Please try again.");
       setIsSubmitting(false);
     }
   };

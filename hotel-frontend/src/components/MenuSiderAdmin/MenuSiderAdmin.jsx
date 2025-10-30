@@ -8,7 +8,8 @@ import {
   MessageOutlined,
   NotificationOutlined,
   AppstoreOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  FireOutlined
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -43,6 +44,11 @@ function MenuSiderAdmin({ collapsed }) {
           label: <Link to="/admin/business-registration">Business Registration</Link>,
           icon: <SolutionOutlined />,
           key: "businessregistration",
+        },
+        {
+          label: <Link to="/admin/promotion">Promotion</Link>,
+          icon: <FireOutlined />,
+          key: "promotion",
         },
       ]
     },

@@ -31,8 +31,9 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
   if (!booking) return null;
 
   const totalNights = dayjs(booking.checkOutDate).diff(dayjs(booking.checkInDate), 'day');
-  const roomTotal = booking.rooms.reduce((acc, room) => acc + (room.price * totalNights), 0);
-  const serviceTotal = booking.services.reduce((acc, s) => acc + s.price, 0);
+
+  const subTotal = booking.rooms.reduce((acc, room) => acc + (room.price * totalNights), 0)
+    + booking.services.reduce((acc, s) => acc + s.price, 0);
 
   const getStatusTag = (status) => {
     switch (status) {
@@ -57,9 +58,9 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
       <div className="booking-detail-modal">
         {booking.cancellationReason && (
           <Alert
-            message="Cancellation Request"
+            message={booking.status === 'CANCELLED' ? "Cancellation Reason" : "Cancellation Request"}
             description={<strong>Reason: {booking.cancellationReason}</strong>}
-            type="warning"
+            type={booking.status === 'CANCELLED' ? "error" : "warning"}
             showIcon
             style={{ marginBottom: 16 }}
           />
@@ -82,6 +83,7 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
             </Descriptions>
           </Col>
         </Row>
+
         <Divider />
         <h4>Room Details</h4>
         <List
@@ -95,6 +97,7 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
             </List.Item>
           )}
         />
+
         {booking.services.length > 0 && (
           <>
             <Divider />
@@ -109,11 +112,17 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
             />
           </>
         )}
+
         <Divider />
         <div className="price-breakdown">
-          <p><span>Rooms Total</span> <strong>{roomTotal.toLocaleString()} VND</strong></p>
-          <p><span>Services Total</span> <strong>{serviceTotal.toLocaleString()} VND</strong></p>
-          <p className="grand-total"><span>Total Price</span> <strong>{booking.totalPrice.toLocaleString()} VND</strong></p>
+          <p><span>Subtotal (Rooms + Services)</span> <strong>{subTotal.toLocaleString()} VND</strong></p>
+          {booking.discountAmount > 0 && (
+            <p className="discount-amount">
+              <span>Discount ({booking.appliedPromotionCode})</span>
+              <strong>- {booking.discountAmount.toLocaleString()} VND</strong>
+            </p>
+          )}
+          <p className="grand-total"><span>Final Price</span> <strong>{booking.totalPrice.toLocaleString()} VND</strong></p>
         </div>
       </div>
     </Modal>
@@ -275,7 +284,6 @@ const BookingManagement = () => {
   const columns = [
     { title: 'Booking ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 100 },
     { title: 'Customer', dataIndex: ['user', 'fullName'], key: 'customer' },
-    { title: 'Hotel', dataIndex: ['hotel', 'name'], key: 'hotel' },
     {
       title: 'Check-in', dataIndex: 'checkInDate', key: 'checkIn',
       render: (date) => dayjs(date).format('DD/MM/YYYY'),

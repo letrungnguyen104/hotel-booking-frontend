@@ -1,15 +1,14 @@
 // src/pages/CheckoutPage/CheckoutPage.jsx
-
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Row, Col, Card, Form, Input, Button, Steps, Divider, Avatar, List, message } from 'antd';
-import { EnvironmentOutlined, CalendarOutlined, UserOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Row, Col, Card, Form, Input, Button, Steps, Divider, Avatar, List, message, Spin } from 'antd';
+import { EnvironmentOutlined, CalendarOutlined, UserOutlined, ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { toast } from 'sonner';
-// import { createBooking } from '@/service/bookingService'; // Bạn sẽ cần tạo service này
 import './CheckoutPage.scss';
 import { createBooking } from '@/service/bookingService';
+import { validatePromotion } from '@/service/promotionService';
 
 const { Step } = Steps;
 
@@ -19,6 +18,9 @@ const CheckoutPage = () => {
   const dispatch = useDispatch();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [isPromoLoading, setIsPromoLoading] = useState(false);
 
   const checkoutData = useSelector(state => state.checkoutReducer);
   const userDetails = useSelector(state => state.userReducer);
@@ -34,7 +36,8 @@ const CheckoutPage = () => {
 
   const totalNights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
-    return dayjs(checkOut).diff(dayjs(checkIn), 'day');
+    const nights = dayjs(checkOut).diff(dayjs(checkIn), 'day');
+    return nights > 0 ? nights : 1;
   }, [checkIn, checkOut]);
 
   const { roomsTotal, servicesTotal, grandTotal } = useMemo(() => {
@@ -50,6 +53,10 @@ const CheckoutPage = () => {
     return { roomsTotal, servicesTotal, grandTotal };
   }, [cart, totalNights]);
 
+  const finalTotal = useMemo(() => {
+    return grandTotal - discountAmount;
+  }, [grandTotal, discountAmount]);
+
   useEffect(() => {
     if (userDetails) {
       form.setFieldsValue({
@@ -59,6 +66,34 @@ const CheckoutPage = () => {
       });
     }
   }, [userDetails, form]);
+
+  const handleApplyCoupon = async (code) => {
+    console.log(code);
+    if (!code) {
+      setDiscountAmount(0);
+      return;
+    }
+    setIsPromoLoading(true);
+    try {
+      const res = await validatePromotion(code, grandTotal);
+      console.log(res);
+      if (res.valid) {
+        setDiscountAmount(res.discountAmount);
+        setPromoCode(code);
+        toast.success(res.message);
+      } else {
+        setDiscountAmount(0);
+        setPromoCode("");
+        toast.error(res.message);
+      }
+    } catch (error) {
+      setDiscountAmount(0);
+      setPromoCode("");
+      toast.error(error.response?.data?.message || "Invalid code");
+    } finally {
+      setIsPromoLoading(false);
+    }
+  };
 
   const onFinish = async (values) => {
     setIsSubmitting(true);
@@ -80,16 +115,20 @@ const CheckoutPage = () => {
         checkOutDate: checkOut,
         roomsToBook: Object.values(aggregatedCart),
         totalPrice: grandTotal,
+        promotionCode: promoCode,
         customerInfo: values
       };
+
       console.log("Booking Request Payload:", bookingRequest);
       const response = await createBooking(bookingRequest);
+
       if (response && response.paymentUrl) {
         toast.success("Redirecting to payment gateway...");
         dispatch({ type: 'CLEAR_CHECKOUT_DATA' });
         window.location.href = response.paymentUrl;
       } else {
         toast.error("Could not create payment URL.");
+        setIsSubmitting(false);
       }
 
     } catch (error) {
@@ -113,7 +152,6 @@ const CheckoutPage = () => {
   return (
     <div className="checkout-page-container">
       <Row gutter={[24, 24]}>
-        {/* Cột trái: Form và Chi tiết đơn hàng */}
         <Col xs={24} lg={16}>
           <Card className="checkout-card">
             <Steps
@@ -163,7 +201,6 @@ const CheckoutPage = () => {
           </Card>
         </Col>
 
-        {/* Cột phải: Tóm tắt đơn hàng */}
         <Col xs={24} lg={8}>
           <Card className="summary-card sticky-card">
             <Button
@@ -198,13 +235,10 @@ const CheckoutPage = () => {
               <Input.Search
                 placeholder="Enter discount code"
                 enterButton="Apply"
-                onSearch={(value) => {
-                  if (value === 'GIAM10') {
-                    toast.success("Discount code applied!");
-                  } else {
-                    toast.error("Invalid discount code.");
-                  }
-                }}
+                loading={isPromoLoading}
+                onSearch={handleApplyCoupon}
+                disabled={isPromoLoading || discountAmount > 0}
+                suffix={discountAmount > 0 ? <CheckCircleOutlined style={{ color: 'green' }} /> : null}
               />
             </div>
             <Divider />
@@ -212,8 +246,14 @@ const CheckoutPage = () => {
               <h4>Price Breakdown</h4>
               <p><span>Rooms Total ({cart.length}x)</span> <strong>{roomsTotal.toLocaleString()} VND</strong></p>
               <p><span>Services Total</span> <strong>{servicesTotal.toLocaleString()} VND</strong></p>
+              {discountAmount > 0 && (
+                <p className="discount-amount">
+                  <span>Discount ({promoCode})</span>
+                  <strong>- {discountAmount.toLocaleString()} VND</strong>
+                </p>
+              )}
               <Divider />
-              <p className="grand-total"><span>Total Price</span> <strong>{grandTotal.toLocaleString()} VND</strong></p>
+              <p className="grand-total"><span>Total Price</span> <strong>{finalTotal.toLocaleString()} VND</strong></p>
             </div>
             <Button
               type="primary"

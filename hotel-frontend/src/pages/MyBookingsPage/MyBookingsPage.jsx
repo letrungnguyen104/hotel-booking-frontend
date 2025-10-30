@@ -64,9 +64,10 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
   if (!booking) return null;
 
   const totalNights = dayjs(booking.checkOutDate).diff(dayjs(booking.checkInDate), 'day');
-  // Tính toán lại giá từ mảng rooms và services
-  const roomTotal = booking.rooms.reduce((acc, room) => acc + (room.price * totalNights), 0);
-  const serviceTotal = booking.services.reduce((acc, s) => acc + s.price, 0);
+
+  const originalPrice = (booking.totalPrice || 0) + (booking.discountAmount || 0);
+  const subTotal = booking.rooms.reduce((acc, room) => acc + (room.price * totalNights), 0)
+    + booking.services.reduce((acc, s) => acc + s.price, 0);
 
   const getStatusTag = (status) => {
     switch (status) {
@@ -128,9 +129,14 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
         )}
         <Divider />
         <div className="price-breakdown">
-          <p><span>Rooms Total</span> <strong>{roomTotal.toLocaleString()} VND</strong></p>
-          <p><span>Services Total</span> <strong>{serviceTotal.toLocaleString()} VND</strong></p>
-          <p className="grand-total"><span>Total Price</span> <strong>{booking.totalPrice.toLocaleString()} VND</strong></p>
+          <p><span>Subtotal</span> <strong>{subTotal.toLocaleString()} VND</strong></p>
+          {booking.discountAmount > 0 && (
+            <p className="discount-amount">
+              <span>Discount ({booking.appliedPromotionCode})</span>
+              <strong>- {booking.discountAmount.toLocaleString()} VND</strong>
+            </p>
+          )}
+          <p className="grand-total"><span>Total Price Paid</span> <strong>{booking.totalPrice.toLocaleString()} VND</strong></p>
         </div>
       </div>
     </Modal>
@@ -219,6 +225,7 @@ const MyBookingsPage = () => {
   useEffect(() => {
     fetchMyBookings();
   }, []);
+
   const handleViewDetails = (booking) => {
     setSelectedBooking(booking);
     setDetailModalOpen(true);

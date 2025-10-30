@@ -1,3 +1,12 @@
+// src/pages/Homepage/Homepage.scss
+@use "sass:color";
+
+$primary-color: #1677ff;
+$border-color: #f0f0f0;
+$text-color: #333;
+$text-light: #888;
+$background-light: #f8f9fa;
+
 * {
   font-family: "Poppins", sans-serif;
 }
@@ -7,6 +16,19 @@
 .ant-picker-input input,
 .ant-select-selection-placeholder {
   font-family: "Poppins", sans-serif;
+}
+
+.container.homepage-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.home__title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: $text-color;
 }
 
 .homepage {
@@ -117,75 +139,190 @@
   }
 }
 
-// Home
-.home {
+.popular-destinations {
+  padding: 40px 0;
 
-  &__item {
+  .destination-card {
+    position: relative;
     cursor: pointer;
-
-    &:hover img {
-      transform: scale(1.05);
-    }
-  }
-
-  &__title {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 20px 0px;
-  }
-
-  &__img {
-    aspect-ratio: 1/1;
-    width: 100%;
-    height: auto;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
 
     img {
       width: 100%;
-      height: 100%;
+      height: 250px;
       object-fit: cover;
-      transition: transform 300ms ease;
-      transform-origin: center center;
+      display: block;
     }
-  }
 
-  &__location {
-    font-weight: 600;
-    text-align: center;
-  }
-
-  &__quantity {
-    text-align: center;
+    &__name {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      font-weight: 700;
+      font-size: 18px;
+      color: white;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
   }
 }
 
-.ant-carousel {
+.special-offers {
+  padding: 40px 0;
 
-  .slick-prev,
-  .slick-next {
-    font-size: 24px;
-    color: rgb(0, 0, 0);
-    z-index: 10;
+  .offer-card {
+    display: flex;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 
-    &::before {
-      display: block;
-      color: white;
-      font-size: 20px;
-      line-height: 1;
-      opacity: 1;
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     }
 
-    &:hover::before {
-      color: #40a9ff;
+    &__image {
+      width: 200px;
+      flex-shrink: 0;
+
+      @media (max-width: 768px) {
+        width: 100%;
+        height: 180px;
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &__content {
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+
+      h3 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: 8px;
+
+        .anticon {
+          color: $primary-color;
+          margin-right: 8px;
+        }
+      }
+
+      p {
+        flex-grow: 1;
+        color: #555;
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
     }
   }
+}
 
-  .slick-prev {
-    left: 20px;
+.property-types {
+  padding: 40px 0;
+  background-color: $background-light;
+
+  .property-type-card {
+    border-radius: 12px;
+
+    .ant-card-cover {
+      img {
+        height: 180px;
+        object-fit: cover;
+        border-radius: 12px 12px 0 0;
+      }
+    }
+
+    .ant-card-meta {
+      align-items: center;
+    }
+
+    .ant-card-meta-avatar {
+      .anticon {
+        font-size: 24px;
+        color: $primary-color;
+      }
+    }
+
+    .ant-card-meta-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
   }
+}
 
-  .slick-next {
-    right: 20px;
+.why-book-us {
+  padding: 40px 0;
+
+  .why-card {
+    text-align: center;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+
+    .ant-card-body {
+      padding: 16px;
+    }
+
+    .anticon {
+      font-size: 40px;
+      color: $primary-color;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: $text-light;
+      font-size: 14px;
+    }
+  }
+}
+
+.featured-hotels {
+  padding: 40px 0;
+  background-color: $background-light;
+
+  .home__tab {
+    .ant-tabs-nav {
+      margin-bottom: 24px;
+    }
+
+    .ant-tabs-tab {
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}
+
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+
+  &.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

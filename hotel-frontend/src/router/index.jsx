@@ -32,6 +32,7 @@ import Chat from "@/pages/HotelAdmin/Chat/Chat";
 import BookingSuccessPage from "@/pages/BookingSuccessPage/BookingSuccessPage";
 import BookingFailurePage from "@/pages/BookingFailurePage/BookingFailurePage";
 import MyBookingsPage from "@/pages/MyBookingsPage/MyBookingsPage";
+import PromotionManagement from "@/components/Admin/PromotionManagement/PromotionManagement";
 
 
 export const route = [
@@ -78,6 +79,7 @@ export const route = [
       { path: "business-registration", element: <AdminBusinessRegistrationManagement /> },
       { path: "message", element: <AdminMessage /> },
       { path: "notification", element: <AdminNotification /> },
+      { path: "promotion", element: <PromotionManagement /> },
     ]
   },
 ];

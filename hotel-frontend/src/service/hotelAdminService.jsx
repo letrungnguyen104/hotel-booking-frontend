@@ -1,5 +1,5 @@
 // src/service/hotelAdminService.js
-import { get, post, put } from '@/utils/request';
+import { del, get, post, put } from '@/utils/request';
 
 export const getMyBusinessProfile = async () => {
   const response = await get('hotel-admin/my-profile');
@@ -19,4 +19,18 @@ export const createMyBusinessProfile = async (data) => {
 export const checkMyBusinessProfileStatus = async () => {
   const response = await get('hotel-admin/my-status');
   return response.result;
+};
+
+export const getAllBusinessProfiles = async () => {
+  const response = await get('hotel-admin/get-all');
+  return response.result;
+};
+
+export const verifyBusinessProfile = async (profileId) => {
+  const response = await put(`hotel-admin/${profileId}/verify`);
+  return response.result;
+};
+
+export const deleteBusinessProfile = async (profileId) => {
+  await del(`hotel-admin/${profileId}`);
 };

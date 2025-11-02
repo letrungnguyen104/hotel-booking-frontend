@@ -6,12 +6,21 @@ export const getConversations = async () => {
   return response.result;
 };
 
-export const getChatHistory = async (recipientId) => {
-  const response = await get(`chat/history/${recipientId}`);
+export const getChatHistory = async (recipientId, hotelId) => {
+  let url = `chat/history/${recipientId}`;
+  if (hotelId) {
+    url += `?hotelId=${hotelId}`;
+  }
+  const response = await get(url);
   return response.result;
 };
 
 export const getOnlineUsers = async () => {
   const response = await get('presence/online-users');
-  return response;
+  return response.result;
+};
+
+export const getAdminConversations = async () => {
+  const response = await get('users/admin/chat-list');
+  return response.result;
 };

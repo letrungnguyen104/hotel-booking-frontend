@@ -5,13 +5,15 @@ import userReducer from './user';
 import searchReducer from './search';
 import checkoutReducer from './checkout';
 import chatReducer from './chat';
+import adminChatReducer from './adminChatReducer';
 
 const allReducers = combineReducers({
   loginReducer,
   userReducer,
   searchReducer,
   checkoutReducer,
-  chatReducer
+  chatReducer,
+  adminChatReducer
 })
 
 export default allReducers

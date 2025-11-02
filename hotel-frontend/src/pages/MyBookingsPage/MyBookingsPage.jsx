@@ -1,12 +1,13 @@
 // src/pages/MyBookingsPage/MyBookingsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Spin, Empty, Tag, Button, Avatar, message, Space, Modal, List, Descriptions, Divider, Form, Input } from 'antd';
-import { EnvironmentOutlined, CalendarOutlined, EyeOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, CalendarOutlined, EyeOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { getMyBookings, cancelBooking } from '@/service/bookingService';
 import { toast } from 'sonner';
 import './MyBookingPage.scss';
+import ReviewModal from '@/components/ReviewModal/ReviewModal';
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -143,7 +144,7 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
   );
 };
 
-const BookingCard = ({ booking, onViewDetails, onCancelBooking }) => {
+const BookingCard = ({ booking, onViewDetails, onCancelBooking, onWriteReview }) => {
   const navigate = useNavigate();
   const totalNights = dayjs(booking.checkOutDate).diff(dayjs(booking.checkInDate), 'day');
 
@@ -191,6 +192,15 @@ const BookingCard = ({ booking, onViewDetails, onCancelBooking }) => {
                 Request Cancellation
               </Button>
             )}
+            {booking.status === 'COMPLETED' && (
+              booking.hasReview ? (
+                <Button size="small" icon={<CheckCircleOutlined />} disabled>Reviewed</Button>
+              ) : (
+                <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => onWriteReview(booking)}>
+                  Write a Review
+                </Button>
+              )
+            )}
             <Button size="small" icon={<EyeOutlined />} onClick={() => onViewDetails(booking)}>
               View Details
             </Button>
@@ -210,6 +220,7 @@ const MyBookingsPage = () => {
 
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
 
   const fetchMyBookings = () => {
@@ -234,9 +245,16 @@ const MyBookingsPage = () => {
     setSelectedBooking(booking);
     setCancelModalOpen(true);
   };
+
+  const handleOpenReviewModal = (booking) => {
+    setSelectedBooking(booking);
+    setReviewModalOpen(true);
+  };
+
   const handleCloseModals = () => {
     setDetailModalOpen(false);
     setCancelModalOpen(false);
+    setReviewModalOpen(false);
     setSelectedBooking(null);
   };
 
@@ -263,6 +281,7 @@ const MyBookingsPage = () => {
             booking={booking}
             onViewDetails={handleViewDetails}
             onCancelBooking={handleOpenCancelModal}
+            onWriteReview={handleOpenReviewModal}
           />
         ))}
       </div>
@@ -303,6 +322,16 @@ const MyBookingsPage = () => {
       <CancelBookingModal
         booking={selectedBooking}
         open={cancelModalOpen}
+        onClose={handleCloseModals}
+        onSuccess={() => {
+          handleCloseModals();
+          fetchMyBookings();
+        }}
+      />
+
+      <ReviewModal
+        booking={selectedBooking}
+        open={reviewModalOpen}
         onClose={handleCloseModals}
         onSuccess={() => {
           handleCloseModals();

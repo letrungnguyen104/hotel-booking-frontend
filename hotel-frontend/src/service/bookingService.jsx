@@ -46,3 +46,13 @@ export const checkOutBooking = async (bookingId) => {
   const response = await patch(`bookings/hotel-admin/check-out/${bookingId}`);
   return response.result;
 };
+
+export const createReview = async (data) => {
+  const response = await post('reviews', data);
+  return response.result;
+};
+
+export const getReviewsByHotelId = async (hotelId) => {
+  const response = await get(`reviews/hotel/${hotelId}`);
+  return response.result;
+};

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, Spin, Tag, Rate, Image, Button, Row, Col, Empty, Checkbox, message, Space } from "antd";
-import { EnvironmentOutlined, CheckCircleOutlined, MessageOutlined } from "@ant-design/icons";
+import { EnvironmentOutlined, CheckCircleOutlined, MessageOutlined, FlagOutlined } from "@ant-design/icons";
 import { getHotelById } from "@/service/hotelService";
 import { getAvailableRoomTypes, getRoomTypesByHotel } from "@/service/roomTypeService";
 import { getServicesByHotel } from "@/service/serviceService";
@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
 import { useNavigate } from "react-router-dom";
+import HotelReviews from "@/components/HotelReview/HotelReviews";
+import ReportModal from "@/components/ReportModal/ReportModal";
 
 const RoomSelectionPanel = ({ roomType, hotelId, onAddToCart }) => {
   const [services, setServices] = useState([]);
@@ -119,6 +121,9 @@ const HotelDetail = () => {
   const [error, setError] = useState(null);
   const [openRoomTypeId, setOpenRoomTypeId] = useState(null);
 
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportTarget, setReportTarget] = useState(null);
+
   const checkIn = searchState.dates?.[0] ? dayjs(searchState.dates[0]).format('YYYY-MM-DD') : null;
   const checkOut = searchState.dates?.[1] ? dayjs(searchState.dates[1]).format('YYYY-MM-DD') : null;
 
@@ -216,6 +221,15 @@ const HotelDetail = () => {
     navigate('/chat');
   };
 
+  const handleOpenReportModal = () => {
+    if (!userDetails) {
+      toast.error("You must be logged in to report.");
+      return;
+    }
+    setReportTarget({ type: 'HOTEL', id: hotel.id, name: hotel.name });
+    setIsReportModalOpen(true);
+  };
+
   const isOwner = userDetails && userDetails.id === hotel.owner.id;
 
   return (
@@ -236,15 +250,28 @@ const HotelDetail = () => {
         </div>
         <div className="hotel-location-chat-wrapper">
           <p className="hotel-location"><EnvironmentOutlined /> {hotel.address}</p>
-          {!isOwner && userDetails && (
-            <Button
-              className="chat-with-hotel-btn"
-              icon={<MessageOutlined />}
-              onClick={handleStartChat}
-            >
-              Chat with hotel
-            </Button>
-          )}
+          <Space>
+            {!isOwner && userDetails && (
+              <Button
+                className="report-hotel-btn"
+                icon={<FlagOutlined />}
+                onClick={handleOpenReportModal}
+                danger
+                type="text"
+              >
+                Report this property
+              </Button>
+            )}
+            {!isOwner && userDetails && (
+              <Button
+                className="chat-with-hotel-btn"
+                icon={<MessageOutlined />}
+                onClick={handleStartChat}
+              >
+                Chat with hotel
+              </Button>
+            )}
+          </Space>
         </div>
 
         <div className="gallery-section">
@@ -349,6 +376,11 @@ const HotelDetail = () => {
             <Empty description={checkIn ? "No available room types found for the selected dates." : "This hotel has not listed any rooms yet."} />
           )}
         </div>
+
+        <div className="reviews-section">
+          <h3>Guest Reviews</h3>
+          <HotelReviews hotelId={id} />
+        </div>
       </div>
 
       {hotelInCart && hotelInCart.id === parseInt(id) && (
@@ -358,6 +390,12 @@ const HotelDetail = () => {
           onCheckout={handleGoToCheckout}
         />
       )}
+
+      <ReportModal
+        open={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        target={reportTarget}
+      />
     </>
   );
 };

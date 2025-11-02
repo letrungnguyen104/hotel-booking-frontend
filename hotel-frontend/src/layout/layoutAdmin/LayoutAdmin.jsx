@@ -89,9 +89,6 @@ function LayoutAdmin() {
               <div className="admin-header__collapse" onClick={() => setCollapse(!collapse)}>
                 <MenuFoldOutlined />
               </div>
-              {/* <div className="admin-header__search">
-                <SearchOutlined />
-              </div> */}
             </div>
             <div className="admin-header__nav-right">
               <Notify />

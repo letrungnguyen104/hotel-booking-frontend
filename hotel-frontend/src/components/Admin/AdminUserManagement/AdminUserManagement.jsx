@@ -1,12 +1,14 @@
 // src/components/Admin/AdminUserManagement/AdminUserManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Select, Space, Tag, message, Card, Row, Col } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, MessageOutlined } from '@ant-design/icons';
 import { getAllUsers, adminCreateUser, adminUpdateUser, adminDeleteUser } from '@/service/userService';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
 import './AdminUserManagement.scss';
 import { getProvinces } from '@/service/locationService';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 const { Option } = Select;
 const { Search } = Input;
@@ -20,6 +22,8 @@ const AdminUserManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [provinces, setProvinces] = useState([]);
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -32,6 +36,17 @@ const AdminUserManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleChat = (user) => {
+    dispatch({
+      type: 'ADMIN_START_CHAT_WITH',
+      payload: {
+        recipientId: user.id,
+        recipientName: user.fullName || user.username
+      }
+    });
+    navigate('/admin/message');
   };
 
   useEffect(() => {
@@ -147,6 +162,7 @@ const AdminUserManagement = () => {
       title: 'Action', key: 'action',
       render: (_, record) => (
         <Space size="middle">
+          <Button icon={<MessageOutlined />} onClick={() => handleChat(record)}>Chat</Button>
           <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>Edit</Button>
           {record.status === 1 && (
             <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record)}>Deactivate</Button>

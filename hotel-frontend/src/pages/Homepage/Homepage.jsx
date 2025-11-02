@@ -1,7 +1,7 @@
 // src/pages/Homepage/Homepage.jsx
 import React, { useState, useEffect } from "react";
 import "./Homepage.scss";
-import { Col, Row, Form, DatePicker, Button, Tabs, Select, AutoComplete, Card } from "antd";
+import { Col, Row, Form, DatePicker, Button, Tabs, Select, AutoComplete, Card, FloatButton } from "antd";
 import {
   SearchOutlined,
   TagOutlined,
@@ -10,14 +10,15 @@ import {
   StarOutlined,
   LikeOutlined,
   CustomerServiceOutlined,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
+  MessageOutlined
 } from "@ant-design/icons";
 import RoomListHome from '../RoomListHome/RoomListHome';
 import { useNavigate } from "react-router-dom";
 import dayjs from 'dayjs';
 import { toast } from "sonner";
 import { getProvinces } from "@/service/locationService";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setSearchParams } from "@/action/search";
 import { useInView } from 'react-intersection-observer';
 import { getFeaturedPromotions } from "@/service/promotionService";
@@ -70,6 +71,7 @@ const Homepage = () => {
   const [options, setOptions] = useState([]);
 
   const [featuredOffers, setFeaturedOffers] = useState([]);
+  const userDetails = useSelector(state => state.userReducer);
 
   useEffect(() => {
     getProvinces().then(data => {
@@ -86,6 +88,26 @@ const Homepage = () => {
       console.error("Failed to fetch featured promotions:", err);
     });
   }, []);
+
+  const handleChatWithAdmin = () => {
+    if (!userDetails) {
+      toast.error("You must be logged in to chat with support.");
+      return;
+    }
+
+    const ADMIN_ID = 2;
+    const ADMIN_USERNAME = "admin";
+
+    dispatch({
+      type: 'START_CHAT_WITH',
+      payload: {
+        recipientId: ADMIN_ID,
+        recipientName: ADMIN_USERNAME,
+        hotelId: null
+      }
+    });
+    navigate('/chat');
+  };
 
   const handleSearch = (searchText) => {
     if (!searchText) {
@@ -260,6 +282,16 @@ const Homepage = () => {
           </div>
         </FadeIn>
       </section>
+
+      {userDetails && (
+        <FloatButton
+          icon={<MessageOutlined />}
+          type="primary"
+          tooltip="Chat with Support"
+          onClick={handleChatWithAdmin}
+          style={{ right: 24, bottom: 24 }}
+        />
+      )}
     </div>
   );
 };

@@ -7,7 +7,8 @@ import {
   EyeOutlined,
   StopOutlined,
   SendOutlined,
-  CheckSquareOutlined
+  CheckSquareOutlined,
+  MessageOutlined
 } from '@ant-design/icons';
 import { getAllHotelsForAdmin, approveHotel, rejectHotel, banHotel, unbanHotel } from '@/service/hotelService';
 import { toast } from 'sonner';
@@ -15,6 +16,8 @@ import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
 import './AdminHotelManagement.scss';
 import { sendNotification } from '@/service/notificationService';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -26,11 +29,23 @@ const AdminHotelManagement = () => {
   const [filters, setFilters] = useState({ searchText: '', status: 'ALL' });
   const [isNotifySubmitting, setIsNotifySubmitting] = useState(false);
 
-  // State cho các Modal
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [notifyModalOpen, setNotifyModalOpen] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [notifyForm] = Form.useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleChat = (hotel) => {
+    dispatch({
+      type: 'ADMIN_START_CHAT_WITH',
+      payload: {
+        recipientId: hotel.owner.id,
+        recipientName: hotel.owner.username
+      }
+    });
+    navigate('/admin/message');
+  };
 
   const fetchHotels = async () => {
     setLoading(true);
@@ -60,7 +75,6 @@ const AdminHotelManagement = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  // --- Xử lý các hành động ---
 
   const handleApprove = async (id) => {
     try {
@@ -160,10 +174,10 @@ const AdminHotelManagement = () => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 80 },
-    { title: 'Hotel Name', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
-    { title: 'Owner', dataIndex: ['owner', 'username'], key: 'owner' },
-    { title: 'City', dataIndex: 'city', key: 'city' },
+    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 65 },
+    { title: 'Hotel Name', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name), width: 150 },
+    { title: 'Owner', dataIndex: ['owner', 'username'], key: 'owner', width: 200 },
+    { title: 'City', dataIndex: 'city', key: 'city', width: 100 },
     { title: 'Status', dataIndex: 'status', key: 'status', render: getStatusTag, width: 120 },
     {
       title: 'Action',
@@ -172,6 +186,9 @@ const AdminHotelManagement = () => {
       width: 320,
       render: (_, record) => (
         <Space size="small" wrap>
+          <Button icon={<MessageOutlined />} onClick={() => handleChat(record)}>
+            Chat
+          </Button>
           <Button icon={<EyeOutlined />} onClick={() => handleViewDetails(record)}>
             View
           </Button>

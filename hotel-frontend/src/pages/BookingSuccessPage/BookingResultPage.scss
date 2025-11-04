@@ -1,0 +1,71 @@
+@use "sass:color";
+
+$success-color: #52c41a;
+$error-color: #ff4d4f;
+$background-color: #f8f9fa;
+$card-shadow: rgba(0, 0, 0, 0.08);
+
+.booking-result-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 150px);
+  background-color: $background-color;
+  padding: 40px 20px;
+
+  .booking-result-card {
+    background: #ffffff;
+    padding: 48px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px $card-shadow;
+    max-width: 600px;
+    text-align: center;
+    border-top: 5px solid;
+  }
+
+  .ant-result-success {
+    border-top-color: $success-color;
+
+    .ant-result-icon .anticon {
+      font-size: 72px;
+      color: $success-color;
+    }
+  }
+
+  .ant-result-error {
+    border-top-color: $error-color;
+
+    .ant-result-icon .anticon {
+      font-size: 72px;
+      color: $error-color;
+    }
+  }
+
+  .ant-result-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .ant-result-subtitle {
+    font-size: 16px;
+    color: #555;
+  }
+
+  .ant-result-extra {
+    margin-top: 32px;
+
+    .ant-btn {
+      height: 40px;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 0 24px;
+      border-radius: 6px;
+
+      // Nút chính
+      &.ant-btn-primary {
+        box-shadow: 0 2px 0 rgba(5, 145, 255, 0.1);
+      }
+    }
+  }
+}

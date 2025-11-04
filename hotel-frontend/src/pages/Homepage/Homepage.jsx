@@ -11,7 +11,8 @@ import {
   LikeOutlined,
   CustomerServiceOutlined,
   SafetyCertificateOutlined,
-  MessageOutlined
+  MessageOutlined,
+  ArrowRightOutlined
 } from "@ant-design/icons";
 import RoomListHome from '../RoomListHome/RoomListHome';
 import { useNavigate } from "react-router-dom";
@@ -128,6 +129,16 @@ const Homepage = () => {
       return;
     }
     dispatch(setSearchParams({ address, dates, guests }));
+    navigate('/search');
+  };
+
+  const handleViewAllHotels = () => {
+    const defaultParams = {
+      address: "",
+      dates: [dayjs(), dayjs().add(1, 'day')],
+      guests: 2
+    };
+    dispatch(setSearchParams(defaultParams));
     navigate('/search');
   };
 
@@ -275,7 +286,12 @@ const Homepage = () => {
 
         <FadeIn>
           <div className="featured-hotels">
-            <h2 className="home__title">Featured accommodations</h2>
+            <div className="home__title-wrapper">
+              <h2 className="home__title">Featured accommodations</h2>
+              <Button type="link" className="view-all-btn" onClick={handleViewAllHotels}>
+                View All Hotels <ArrowRightOutlined />
+              </Button>
+            </div>
             <div className="home__tab">
               <Tabs defaultActiveKey="1" items={itemsTab} />
             </div>

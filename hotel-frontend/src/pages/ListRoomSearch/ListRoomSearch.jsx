@@ -1,4 +1,3 @@
-// src/pages/ListRoomSearch/ListRoomSearch.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Rate, Slider, Tag, Spin, Result, Pagination, Collapse, Checkbox, Space, Row, Col } from 'antd';
@@ -30,7 +29,7 @@ const ListRoomSearch = () => {
 
   useEffect(() => {
     const { address, guests, dates } = searchState;
-    if (address && guests && dates && dates[0] && dates[1]) {
+    if (address !== null && address !== undefined && guests && dates && dates[0] && dates[1]) {
       const params = {
         address,
         guests,
@@ -39,7 +38,9 @@ const ListRoomSearch = () => {
       };
       setLoading(true);
       searchHotels(params)
-        .then(data => setOriginalHotels(data || []))
+        .then(data => {
+          setOriginalHotels(data || [])
+        })
         .catch(err => {
           console.error("Failed to search hotels:", err);
           setOriginalHotels([]);
@@ -47,6 +48,7 @@ const ListRoomSearch = () => {
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
+      setOriginalHotels([]);
     }
   }, [searchState]);
 
@@ -69,8 +71,6 @@ const ListRoomSearch = () => {
   const handleHotelClick = (hotel) => {
     navigate(`/hotel/${hotel.id}`);
   };
-
-  console.log(originalHotels);
 
   const renderHotelList = () => {
     if (loading) {

@@ -1,8 +1,9 @@
 // src/service/serviceService.js
+import { getPublic } from '@/utils/publicRequest';
 import { get, post, put, del } from '@/utils/request';
 
 export const getServicesByHotel = async (hotelId) => {
-  const response = await get(`services/hotel/${hotelId}`);
+  const response = await getPublic(`services/hotel/${hotelId}`);
   return response.result;
 };
 

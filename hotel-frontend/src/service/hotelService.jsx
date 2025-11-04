@@ -32,6 +32,7 @@ export const updateHotel = async (id, formData) => {
 export const searchHotels = async (params) => {
   const queryString = new URLSearchParams(params).toString();
   const response = await get(`hotels/search?${queryString}`);
+  console.log(response);
   return response.result;
 };
 

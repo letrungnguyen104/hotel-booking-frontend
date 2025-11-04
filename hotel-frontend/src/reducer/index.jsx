@@ -6,6 +6,7 @@ import searchReducer from './search';
 import checkoutReducer from './checkout';
 import chatReducer from './chat';
 import adminChatReducer from './adminChatReducer';
+import uiReducer from './uiReducer';
 
 const allReducers = combineReducers({
   loginReducer,
@@ -13,7 +14,8 @@ const allReducers = combineReducers({
   searchReducer,
   checkoutReducer,
   chatReducer,
-  adminChatReducer
+  adminChatReducer,
+  uiReducer
 })
 
 export default allReducers

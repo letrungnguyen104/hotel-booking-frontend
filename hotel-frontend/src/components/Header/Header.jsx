@@ -1,4 +1,3 @@
-// src/components/Header/Header.jsx
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Header.scss";
 import { LogoutOutlined, MessageOutlined, CalendarOutlined } from "@ant-design/icons";
@@ -29,6 +28,7 @@ function Header() {
 
   const isLogin = useSelector((state) => state.loginReducer);
   const userDetails = useSelector((state) => state.userReducer);
+  const isLoginModalVisible = useSelector((state) => state.uiReducer?.isLoginModalOpen);
   const dispatch = useDispatch();
 
   const isHotelAdmin = userDetails?.roles?.some(
@@ -83,6 +83,17 @@ function Header() {
     }
   }, [dispatch, userDetails]);
 
+  useEffect(() => {
+    if (isLoginModalVisible) {
+      setIsLoginModalOpen(true);
+    }
+  }, [isLoginModalVisible]);
+
+  const handleCloseLoginModal = () => {
+    setIsLoginModalOpen(false);
+    dispatch({ type: 'CLOSE_LOGIN_MODAL' });
+  };
+
   const handleLogin = async (values) => {
     try {
       const response = await login(values);
@@ -97,14 +108,13 @@ function Header() {
         const userPrf = await getUserById(userId);
         dispatch(setUser(userPrf));
         setLoadingUser(false);
-        setIsLoginModalOpen(false);
+        handleCloseLoginModal();
 
         const isAdmin = userPrf?.roles?.some(role => role.roleName === 'ADMIN');
 
         if (isAdmin) {
           navigate('/admin');
         } else {
-          navigate('/');
         }
       } else {
         toast.error("Login failed!");
@@ -254,7 +264,7 @@ function Header() {
         )}
       </div>
 
-      <Modal title="Login" open={isLoginModalOpen} onCancel={() => setIsLoginModalOpen(false)} footer={null} centered>
+      <Modal title="Login" open={isLoginModalOpen} onCancel={handleCloseLoginModal} footer={null} centered>
         <Form form={loginForm} layout="vertical" onFinish={handleLogin}>
           <Form.Item label="Username" name="username" rules={[{ required: true, message: "Please enter your username" }]}>
             <Input placeholder="Enter your username" />

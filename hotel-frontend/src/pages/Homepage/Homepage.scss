@@ -25,10 +25,22 @@ $background-light: #f8f9fa;
 }
 
 .home__title {
-  font-size: 28px;
+  margin-bottom: 0;
   font-weight: 600;
+  font-size: 30px;
+}
+
+.home__title-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
-  color: $text-color;
+
+  .view-all-btn {
+    font-size: 16px;
+    font-weight: 500;
+    padding-right: 0;
+  }
 }
 
 .homepage {

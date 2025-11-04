@@ -72,7 +72,6 @@ const HotelManagement = () => {
 
   return (
     <div className="hotel-management">
-      {/* Header */}
       <div className="header">
         <h2>My Hotels</h2>
         <Button
@@ -104,7 +103,6 @@ const HotelManagement = () => {
         </div>
       </div>
 
-      {/* Danh sách khách sạn */}
       <div className="hotel-list">
         {hotels.length === 0 ? (
           <Empty description="No hotels found. Add your first hotel!" />

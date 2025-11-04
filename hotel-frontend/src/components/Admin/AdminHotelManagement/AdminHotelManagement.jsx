@@ -174,16 +174,16 @@ const AdminHotelManagement = () => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 65 },
-    { title: 'Hotel Name', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name), width: 150 },
-    { title: 'Owner', dataIndex: ['owner', 'username'], key: 'owner', width: 200 },
+    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 40 },
+    { title: 'Hotel Name', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name), width: 80 },
+    { title: 'Owner', dataIndex: ['owner', 'username'], key: 'owner', width: 80 },
     { title: 'City', dataIndex: 'city', key: 'city', width: 100 },
-    { title: 'Status', dataIndex: 'status', key: 'status', render: getStatusTag, width: 120 },
+    { title: 'Status', dataIndex: 'status', key: 'status', render: getStatusTag, width: 60 },
     {
       title: 'Action',
       key: 'action',
       fixed: 'right',
-      width: 320,
+      width: 290,
       render: (_, record) => (
         <Space size="small" wrap>
           <Button icon={<MessageOutlined />} onClick={() => handleChat(record)}>
@@ -193,7 +193,6 @@ const AdminHotelManagement = () => {
             View
           </Button>
 
-          {/* Hành động khi đang PENDING */}
           {record.status === 'PENDING' && (
             <>
               <Button type="primary" icon={<CheckCircleOutlined />} onClick={() => handleApprove(record.id)}>

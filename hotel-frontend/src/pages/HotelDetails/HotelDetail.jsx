@@ -332,7 +332,7 @@ const HotelDetail = () => {
 
         <div className="hotel-location-chat-wrapper">
           <p className="hotel-location">
-            <EnvironmentOutlined /> {hotel.address}
+            <EnvironmentOutlined /> {`${hotel.address}, ${hotel.city}`}
           </p>
           <Space>
             {!isOwner && (

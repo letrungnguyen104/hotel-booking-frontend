@@ -1,16 +1,33 @@
-// src/components/AddHotelModal/AddHotelModal.jsx
-import React, { useState } from "react";
-import { Modal, Form, Input, Upload, Button, message } from "antd";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
+import { Modal, Form, Input, Upload, Button, message, Select } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { createHotel } from "@/service/hotelService";
 import { getUserIdFromToken } from "@/service/tokenService";
+import { getProvinces } from "@/service/locationService";
 
 const { TextArea } = Input;
+const { Option } = Select;
 
 const AddHotelModal = ({ open, onClose, onSuccess }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [provinces, setProvinces] = useState([]);
+
+  useEffect(() => {
+    getProvinces().then(data => {
+      if (data) {
+        setProvinces(data.map(p => ({ value: p.name, label: p.name })));
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      form.resetFields();
+      setFileList([]);
+    }
+  }, [open, form]);
 
   const handleOk = async () => {
     try {
@@ -32,14 +49,14 @@ const AddHotelModal = ({ open, onClose, onSuccess }) => {
 
       await createHotel(formData);
 
-      message.success("Hotel created successfully!");
+      message.success("Hotel created successfully! Please wait for Admin approval.");
       form.resetFields();
       setFileList([]);
       onSuccess();
       onClose();
     } catch (err) {
       console.error(err);
-      message.error("Failed to create hotel");
+      message.error(err.response?.data?.message || "Failed to create hotel");
     } finally {
       setLoading(false);
     }
@@ -51,7 +68,14 @@ const AddHotelModal = ({ open, onClose, onSuccess }) => {
     beforeUpload: () => false,
     onChange: ({ fileList }) => setFileList(fileList),
     fileList,
+    onRemove: (file) => {
+      setFileList(prevList => prevList.filter(item => item.uid !== file.uid));
+    }
   };
+
+  const filterProvinces = (input, option) =>
+    (option?.label ?? '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .includes(input.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
 
   return (
     <Modal
@@ -62,6 +86,7 @@ const AddHotelModal = ({ open, onClose, onSuccess }) => {
       confirmLoading={loading}
       okText="Create"
       width={700}
+      destroyOnClose
     >
       <Form form={form} layout="vertical">
         <Form.Item
@@ -73,26 +98,31 @@ const AddHotelModal = ({ open, onClose, onSuccess }) => {
         </Form.Item>
 
         <Form.Item
-          name="address"
-          label="Address"
-          rules={[{ required: true, message: "Please enter address" }]}
+          name="city"
+          label="City / Province"
+          rules={[{ required: true, message: "Please select a city/province" }]}
         >
-          <Input placeholder="Enter address" />
+          <Select
+            showSearch
+            placeholder="Select or search for your province"
+            options={provinces}
+            filterOption={filterProvinces}
+          />
         </Form.Item>
 
         <Form.Item
-          name="city"
-          label="City"
-          rules={[{ required: true, message: "Please enter city" }]}
+          name="address"
+          label="Address (Street, Ward, District)"
+          rules={[{ required: true, message: "Please enter the detailed address" }]}
         >
-          <Input placeholder="Enter city" />
+          <Input placeholder="E.g., 123 Nguyen Van Linh, Hai Chau District" />
         </Form.Item>
 
         <Form.Item
           name="country"
           label="Country"
           rules={[{ required: true, message: "Please enter country" }]}
-        >
+          S       >
           <Input placeholder="Enter country" />
         </Form.Item>
 

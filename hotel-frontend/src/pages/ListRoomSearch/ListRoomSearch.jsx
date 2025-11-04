@@ -28,10 +28,10 @@ const ListRoomSearch = () => {
   const pageSize = 6;
 
   useEffect(() => {
-    const { address, guests, dates } = searchState;
-    if (address !== null && address !== undefined && guests && dates && dates[0] && dates[1]) {
+    const { city, guests, dates } = searchState;
+    if (city !== null && city !== undefined && guests && dates && dates[0] && dates[1]) {
       const params = {
-        address,
+        city,
         guests,
         checkIn: dayjs(dates[0]).format('YYYY-MM-DD'),
         checkOut: dayjs(dates[1]).format('YYYY-MM-DD'),
@@ -102,7 +102,7 @@ const ListRoomSearch = () => {
                     )}
                   </div>
                   <div className="hotel-card__location">
-                    <EnvironmentOutlined /> {hotel.address}
+                    <EnvironmentOutlined /> {hotel.city}
                   </div>
                   <div className="hotel-card__offers">
                     {hotel.amenities?.split(',').slice(0, 3).map((amenity, idx) => (

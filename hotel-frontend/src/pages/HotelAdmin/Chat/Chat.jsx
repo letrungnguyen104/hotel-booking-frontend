@@ -1,5 +1,5 @@
 // src/pages/Chat/Chat.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Input, Avatar, Spin, Empty, message, Badge, Menu, Dropdown } from 'antd';
 import { FlagOutlined } from '@ant-design/icons';
 import { Search, Paperclip, Smile, Send, Phone, MoreVertical } from 'lucide-react';
@@ -23,6 +23,7 @@ const Chat = () => {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [newMessage, setNewMessage] = useState('');
   const [onlineUsers, setOnlineUsers] = useState(new Set());
+  const [searchText, setSearchText] = useState('');
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportTarget, setReportTarget] = useState(null);
@@ -235,6 +236,17 @@ const Chat = () => {
     </Menu>
   );
 
+  const filteredConversations = useMemo(() => {
+    if (!searchText) {
+      return conversations;
+    }
+    const lowerSearch = searchText.toLowerCase();
+    return conversations.filter(convo =>
+      convo.conversationPartnerName.toLowerCase().includes(lowerSearch) ||
+      convo.conversationPartnerUsername.toLowerCase().includes(lowerSearch)
+    );
+  }, [conversations, searchText]);
+
   if (!userDetails) {
     return <div className="chat-layout"><Spin size="large" /></div>;
   }
@@ -247,17 +259,23 @@ const Chat = () => {
         <aside className="conversation-list">
           <div className="cl-header">
             <h2>Tin nhắn</h2>
-            <Input className="cl-search" placeholder="Tìm kiếm khách hàng..." prefix={<Search size={16} color="#888" />} />
+            <Input
+              className="cl-search"
+              placeholder="Search users..."
+              prefix={<Search size={16} color="#888" />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
           </div>
           <div className="cl-items">
             {loadingConvos ? (
               <div className="chat-loading"><Spin /></div>
             ) : (
-              conversations.map(convo => {
+              filteredConversations.map(convo => {
                 const isOnline = onlineUsers.has(convo.conversationPartnerUsername);
                 return (
                   <div
-                    key={convo.conversationPartnerId + (convo.hotelId || 'admin')} // ✅ Thêm key
+                    key={convo.conversationPartnerId}
                     className={`convo-item ${selectedConvo?.conversationPartnerId === convo.conversationPartnerId ? 'active' : ''}`}
                     onClick={() => handleSelectConvo(convo)}
                   >

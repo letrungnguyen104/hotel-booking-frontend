@@ -235,6 +235,27 @@ const BookingManagement = () => {
     });
   };
 
+  const handleRejectPending = (booking) => {
+    Swal.fire({
+      title: `Reject Pending Booking #${booking.id}?`,
+      text: "This booking has not been paid. Rejecting will cancel it and free up the room.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Yes, reject it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await approveCancellation(booking.id);
+          toast.success("Booking rejected and set to Cancelled.");
+          fetchBookings();
+        } catch (error) {
+          toast.error(error.response?.data?.message || "Failed to reject.");
+        }
+      }
+    });
+  };
+
   const handleApproveCancel = (booking) => {
     Swal.fire({
       title: `Approve Cancellation for #${booking.id}?`,
@@ -283,14 +304,14 @@ const BookingManagement = () => {
 
   const columns = [
     { title: 'Booking ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 100 },
-    { title: 'Customer', dataIndex: ['user', 'fullName'], key: 'customer' },
+    { title: 'Customer', dataIndex: ['user', 'fullName'], key: 'customer', width: 120 },
     {
-      title: 'Check-in', dataIndex: 'checkInDate', key: 'checkIn',
+      title: 'Check-in', dataIndex: 'checkInDate', key: 'checkIn', width: 120,
       render: (date) => dayjs(date).format('DD/MM/YYYY'),
       sorter: (a, b) => dayjs(a.checkInDate).unix() - dayjs(b.checkInDate).unix()
     },
     {
-      title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice',
+      title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice', width: 120,
       render: (price) => price.toLocaleString() + " VND",
       sorter: (a, b) => a.totalPrice - b.totalPrice
     },
@@ -303,9 +324,11 @@ const BookingManagement = () => {
           </Tooltip>
 
           {record.status === 'PENDING' && (
-            <Tooltip title="Confirm Booking">
-              <Button type="link" icon={<CheckCircleOutlined />} onClick={() => handleConfirm(record)} />
-            </Tooltip>
+            <>
+              <Tooltip title="Reject Pending Booking">
+                <Button type="link" danger icon={<CloseCircleOutlined />} onClick={() => handleRejectPending(record)} />
+              </Tooltip>
+            </>
           )}
           {record.status === 'CONFIRMED' && (
             <Tooltip title="Check-in Customer">

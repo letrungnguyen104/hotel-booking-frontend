@@ -51,9 +51,9 @@ const locations = [
 ];
 
 const itemsTab = [
-  { key: "1", label: "Ha Noi", children: <RoomListHome city="Ha Noi" /> },
-  { key: "2", label: "Da Nang", children: <RoomListHome city="Da Nang" /> },
-  { key: "3", label: "Ho Chi Minh", children: <RoomListHome city="Ho Chi Minh" /> },
+  { key: "1", label: "Ha Noi", children: <RoomListHome city="Thành phố Hà Nội" /> },
+  { key: "2", label: "Da Nang", children: <RoomListHome city="Thành phố Đà Nẵng" /> },
+  { key: "3", label: "Ho Chi Minh", children: <RoomListHome city="Thành phố Hồ Chí Minh" /> },
 ];
 
 const propertyTypes = [
@@ -123,18 +123,18 @@ const Homepage = () => {
   };
 
   const onFinish = (values) => {
-    const { address, dates, guests } = values;
-    if (!address || !dates || !guests) {
+    const { city, dates, guests } = values;
+    if (!city || !dates || !guests) {
       toast.error("Please fill in all search fields!");
       return;
     }
-    dispatch(setSearchParams({ address, dates, guests }));
+    dispatch(setSearchParams({ city, dates, guests }));
     navigate('/search');
   };
 
   const handleViewAllHotels = () => {
     const defaultParams = {
-      address: "",
+      city: "",
       dates: [dayjs(), dayjs().add(1, 'day')],
       guests: 2
     };
@@ -153,7 +153,7 @@ const Homepage = () => {
             <div className="form__title">Search Your Room</div>
             <div className="form__search-wrapper">
               <SearchOutlined className="form__icon" />
-              <Form.Item name="address" rules={[{ required: false, message: 'Please input destination!' }]}>
+              <Form.Item name="city" rules={[{ required: false, message: 'Please input destination!' }]}>
                 <AutoComplete
                   options={options}
                   onSearch={handleSearch}

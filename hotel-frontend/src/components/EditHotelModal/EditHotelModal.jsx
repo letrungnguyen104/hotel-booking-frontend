@@ -17,6 +17,14 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
   const [currentStatus, setCurrentStatus] = useState(null);
 
   useEffect(() => {
+    getProvinces().then(data => {
+      if (data) {
+        setProvinces(data.map(p => ({ value: p.name, label: p.name })));
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     if (open && hotelId) {
       fetchHotelData(hotelId);
     } else if (!open) {
@@ -24,17 +32,18 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
       setFileList([]);
       setCurrentStatus(null);
     }
-  }, [open, hotelId]);
+  }, [open, hotelId, form]);
 
   const fetchHotelData = async (id) => {
     setLoading(true);
     try {
-      const [hotel, provinceData] = await Promise.all([
-        getHotelById(id),
-        getProvinces()
-      ]);
-      if (provinceData) {
-        setProvinces(provinceData.map(p => ({ value: p.name, label: p.name })));
+      const hotel = await getHotelById(id);
+
+      if (provinces.length === 0) {
+        const provinceData = await getProvinces();
+        if (provinceData) {
+          setProvinces(provinceData.map(p => ({ value: p.name, label: p.name })));
+        }
       }
 
       form.setFieldsValue({
@@ -140,7 +149,7 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
             <Input placeholder="Enter hotel name" />
           </Form.Item>
 
-          <Form.Item name="address" label="Address (Province/City)">
+          <Form.Item label="City / Province" name="city" rules={[{ required: true }]}>
             <Select
               showSearch
               placeholder="Select or search for your province"
@@ -149,8 +158,8 @@ const EditHotelModal = ({ open, onClose, hotelId, onSuccess }) => {
             />
           </Form.Item>
 
-          <Form.Item label="City" name="city">
-            <Input placeholder="Enter city" />
+          <Form.Item label="Address (Street, Ward, District)" name="address" rules={[{ required: true }]}>
+            <Input placeholder="E.g., 123 Nguyen Van Linh, Hai Chau District" />
           </Form.Item>
 
           <Form.Item label="Country" name="country">

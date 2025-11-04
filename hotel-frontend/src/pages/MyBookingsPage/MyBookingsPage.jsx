@@ -261,7 +261,7 @@ const MyBookingsPage = () => {
   const filterBookings = (status) => {
     const today = dayjs().format('YYYY-MM-DD');
     if (status === 'UPCOMING') {
-      return bookings.filter(b => b.status === 'CONFIRMED' && dayjs(b.checkInDate).isAfter(today));
+      return bookings.filter(b => b.status === 'CONFIRMED' && !dayjs(b.checkInDate).isBefore(today));
     }
     return bookings.filter(b => b.status === status);
   };

@@ -1,5 +1,4 @@
 // src/components/Search/Search.jsx
-
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, Row, Col, AutoComplete, DatePicker, Select, Button } from 'antd';
@@ -28,7 +27,7 @@ const Search = () => {
 
   useEffect(() => {
     form.setFieldsValue({
-      address: searchState.address,
+      city: searchState.city,
       dates: searchState.dates?.[0] ? [dayjs(searchState.dates[0]), dayjs(searchState.dates[1])] : null,
       guests: searchState.guests,
     });
@@ -47,14 +46,14 @@ const Search = () => {
   };
 
   const onFinish = (values) => {
-    const { address, dates, guests } = values;
-    dispatch(setSearchParams({ address, dates, guests }));
+    const { city, dates, guests } = values;
+    dispatch(setSearchParams({ city, dates, guests }));
   };
 
   return (
     <div className='search-component-wrapper'>
       <Form form={form} onFinish={onFinish} layout="inline">
-        <Form.Item name="address" className="search-item search-item--location">
+        <Form.Item name="city" className="search-item search-item--location">
           <AutoComplete
             options={options}
             onSearch={handleSearch}

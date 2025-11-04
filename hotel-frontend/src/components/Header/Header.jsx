@@ -1,18 +1,26 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import logo from "../../assets/img/logo.png";
 import "./Header.scss";
-import { LogoutOutlined, MessageOutlined, CalendarOutlined } from "@ant-design/icons";
+import {
+  LogoutOutlined,
+  MessageOutlined,
+  CalendarOutlined,
+  UserOutlined,
+  ShopOutlined,
+  DashboardOutlined,
+  SolutionOutlined
+} from "@ant-design/icons";
 import { Dropdown, Space, Modal, Form, Input, Button } from "antd";
 import Notify from "../Notify/Notify";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { login } from "@/service/loginServices";
 import { getToken, getUserIdFromToken, setToken } from "@/service/tokenService";
-import { getUserById, register } from "@/service/userService";
+import { getUserById, preRegister, verifyRegister } from "@/service/userService";
 import { useDispatch, useSelector } from "react-redux";
 import { checkLogin } from "@/action/login";
 import { setUser, clearUser } from "@/action/user";
 import ClipLoader from "react-spinners/ClipLoader";
-import { preRegister, verifyRegister } from "@/service/userService";
 
 function Header() {
   const navigate = useNavigate();
@@ -28,7 +36,9 @@ function Header() {
 
   const isLogin = useSelector((state) => state.loginReducer);
   const userDetails = useSelector((state) => state.userReducer);
-  const isLoginModalVisible = useSelector((state) => state.uiReducer?.isLoginModalOpen);
+  const isLoginModalVisible = useSelector(
+    (state) => state.uiReducer?.isLoginModalOpen
+  );
   const dispatch = useDispatch();
 
   const isHotelAdmin = userDetails?.roles?.some(
@@ -38,25 +48,23 @@ function Header() {
     (role) => role.roleName === "ADMIN"
   );
   const isRegularUser = isLogin && !isAdmin && !isHotelAdmin;
-  const items = [
-    { key: "1", label: "My Account", disabled: true },
-    { type: "divider" },
-    { key: "2", label: "Profile" },
-  ];
+
+  const items = [{ key: "2", label: "Profile", icon: <UserOutlined /> }];
 
   if (isHotelAdmin) {
-    items.push({ key: "3", label: "Hotel Management" });
+    items.push({ key: "3", label: "Hotel Management", icon: <ShopOutlined /> });
     items.push({ key: "8", label: "My Bookings", icon: <CalendarOutlined /> });
+    items.push({ key: "6", label: "My Chats", icon: <MessageOutlined /> });
   } else if (isAdmin) {
-    items.push({ key: "7", label: "Admin Dashboard" });
+    items.push({ key: "7", label: "Admin Dashboard", icon: <DashboardOutlined /> });
   } else if (isRegularUser) {
-    items.push({ key: "3", label: "Hotel business registration" });
+    items.push({ key: "3", label: "Hotel business registration", icon: <SolutionOutlined /> });
     items.push({ key: "6", label: "My Chats", icon: <MessageOutlined /> });
     items.push({ key: "8", label: "My Bookings", icon: <CalendarOutlined /> });
   }
 
-  items.push({ key: "5", label: "Log out", icon: <LogoutOutlined /> });
-
+  items.push({ type: "divider" });
+  items.push({ key: "5", label: "Log out", icon: <LogoutOutlined />, danger: true });
 
   useEffect(() => {
     const token = getToken();
@@ -91,7 +99,7 @@ function Header() {
 
   const handleCloseLoginModal = () => {
     setIsLoginModalOpen(false);
-    dispatch({ type: 'CLOSE_LOGIN_MODAL' });
+    dispatch({ type: "CLOSE_LOGIN_MODAL" });
   };
 
   const handleLogin = async (values) => {
@@ -110,11 +118,10 @@ function Header() {
         setLoadingUser(false);
         handleCloseLoginModal();
 
-        const isAdmin = userPrf?.roles?.some(role => role.roleName === 'ADMIN');
+        const isAdmin = userPrf?.roles?.some((role) => role.roleName === "ADMIN");
 
         if (isAdmin) {
-          navigate('/admin');
-        } else {
+          navigate("/admin");
         }
       } else {
         toast.error("Login failed!");
@@ -130,8 +137,6 @@ function Header() {
       const { confirmPassword, ...userData } = values;
       setLoadingRegister(true);
       const response = await preRegister(userData);
-      console.log("PreRegister response:", response);
-
       if (response.message?.includes("Verification code sent")) {
         setLoadingRegister(false);
         toast.success("Verification code sent to your email!");
@@ -190,7 +195,7 @@ function Header() {
         handleLogout();
         break;
       case "6":
-        if (isRegularUser) navigate("/chat");
+        navigate("/chat");
         break;
       case "7":
         if (isAdmin) navigate("/admin");
@@ -203,13 +208,12 @@ function Header() {
     }
   };
 
-
   return (
     <>
       <div className="header">
-        <div className="header__logo">
+        <div className="header__logo" onClick={() => navigate("/")}>
           <img
-            src="https://cdn6.agoda.net/images/kite-js/logo/agoda/color-default.svg"
+            src={logo}
             alt="Agoda Logo"
           />
         </div>
@@ -217,13 +221,22 @@ function Header() {
         <div className="header__nav">
           <ul>
             <li>
-              <NavLink to="/" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink
+                to="/"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 Home
               </NavLink>
-              <NavLink to="/contact" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink
+                to="/contact"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 Contact us
               </NavLink>
-              <NavLink to="/offers" className={({ isActive }) => (isActive ? "active" : "")}>
+              <NavLink
+                to="/offers"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 Discounts and Offers
               </NavLink>
             </li>
@@ -239,12 +252,17 @@ function Header() {
             <div className="header__notify">
               <Notify />
             </div>
-            <p className="header__name">{userDetails.fullName || userDetails.username}</p>
+            <p className="header__name">
+              {userDetails.fullName || userDetails.username}
+            </p>
             <Dropdown menu={{ items, onClick: handleMenuClick }}>
               <a onClick={(e) => e.preventDefault()}>
                 <Space>
                   <img
-                    src={userDetails.imagePath || "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"}
+                    src={
+                      userDetails.imagePath ||
+                      "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+                    }
                     alt="avatar"
                     className="header__avatar"
                   />
@@ -254,22 +272,42 @@ function Header() {
           </div>
         ) : (
           <div className="header__button">
-            <button onClick={() => setIsLoginModalOpen(true)} className="header__button--login">
+            <button
+              onClick={() => setIsLoginModalOpen(true)}
+              className="header__button--login"
+            >
               Login
             </button>
-            <button onClick={() => setIsRegisterModalOpen(true)} className="header__button--register">
+            <button
+              onClick={() => setIsRegisterModalOpen(true)}
+              className="header__button--register"
+            >
               Register
             </button>
           </div>
         )}
       </div>
 
-      <Modal title="Login" open={isLoginModalOpen} onCancel={handleCloseLoginModal} footer={null} centered>
+      <Modal
+        title="Login"
+        open={isLoginModalOpen}
+        onCancel={handleCloseLoginModal}
+        footer={null}
+        centered
+      >
         <Form form={loginForm} layout="vertical" onFinish={handleLogin}>
-          <Form.Item label="Username" name="username" rules={[{ required: true, message: "Please enter your username" }]}>
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[{ required: true, message: "Please enter your username" }]}
+          >
             <Input placeholder="Enter your username" />
           </Form.Item>
-          <Form.Item label="Password" name="password" rules={[{ required: true, message: "Please enter your password" }]}>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please enter your password" }]}
+          >
             <Input.Password placeholder="Enter your password" />
           </Form.Item>
           <Button type="primary" htmlType="submit" block>
@@ -278,9 +316,19 @@ function Header() {
         </Form>
       </Modal>
 
-      <Modal title="Register" open={isRegisterModalOpen} onCancel={() => setIsRegisterModalOpen(false)} footer={null} centered>
+      <Modal
+        title="Register"
+        open={isRegisterModalOpen}
+        onCancel={() => setIsRegisterModalOpen(false)}
+        footer={null}
+        centered
+      >
         <Form form={registerForm} layout="vertical" onFinish={handleRegister}>
-          <Form.Item label="Username" name="username" rules={[{ required: true, message: "Please enter your username" }]}>
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[{ required: true, message: "Please enter your username" }]}
+          >
             <Input placeholder="Enter your username" />
           </Form.Item>
           <Form.Item
@@ -314,7 +362,9 @@ function Header() {
                   if (!value || getFieldValue("password") === value) {
                     return Promise.resolve();
                   }
-                  return Promise.reject(new Error("Passwords do not match!"));
+                  return Promise.reject(
+                    new Error("Passwords do not match!")
+                  );
                 },
               }),
             ]}

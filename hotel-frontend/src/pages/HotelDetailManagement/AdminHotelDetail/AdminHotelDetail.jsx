@@ -68,7 +68,6 @@ const HotelDetail = () => {
 
   return (
     <div className="hotel-detail">
-      {/* Header */}
       <div className="hotel-header">
         <div className="hotel-header__carousel">
           <Carousel autoplay>
@@ -91,7 +90,7 @@ const HotelDetail = () => {
               {hotel.status}
             </Tag>
             <Descriptions column={1} bordered size="small" className="mt-3">
-              <Descriptions.Item label="Address">{hotel.address}</Descriptions.Item>
+              <Descriptions.Item label="Address">{`${hotel.address}, ${hotel.city}`}</Descriptions.Item>
               <Descriptions.Item label="Phone">{hotel.phone}</Descriptions.Item>
               <Descriptions.Item label="Owner">{hotel.owner.username}</Descriptions.Item>
               <Descriptions.Item label="Created">

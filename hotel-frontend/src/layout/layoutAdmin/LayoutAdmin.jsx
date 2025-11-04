@@ -14,8 +14,8 @@ import { getUserById } from "@/service/userService";
 import { checkLogin } from "@/action/login";
 import { setUser, clearUser } from "@/action/user";
 
-import logo from "@/images/logo.png";
-import logoClose from "@/images/logo-close.png";
+import logo from "../../assets/img/logo.png";
+import logoClose from "../../assets/img/logoClose.png";
 import "./LayoutAdmin.scss";
 
 const { Sider, Content } = Layout;

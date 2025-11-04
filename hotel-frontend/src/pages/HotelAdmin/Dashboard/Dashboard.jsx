@@ -1,37 +1,14 @@
 // src/pages/HotelAdmin/Dashboard/Dashboard.jsx
-
-import React, { useState, useMemo } from 'react';
-import { Row, Col, Card, Statistic, DatePicker, Empty, Space } from 'antd';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Row, Col, Card, Statistic, DatePicker, Empty, Space, Spin, message } from 'antd';
 import { DollarCircleOutlined, BookOutlined, UserOutlined } from '@ant-design/icons';
 import { Line, Pie, Column } from '@ant-design/charts';
+import { getDashboardData } from '@/service/bookingService';
 import dayjs from 'dayjs';
 import './Dashboard.scss';
 
 const { RangePicker } = DatePicker;
 
-// --- Dữ liệu giả lập (Mock Data) ---
-const generateMockData = () => {
-  const data = [];
-  const roomTypes = ['Deluxe Room', 'Family Suite', 'Standard Room', 'VIP Couple'];
-  const statuses = ['CONFIRMED', 'CHECKED_IN', 'CANCELLED', 'COMPLETED'];
-  for (let i = 0; i < 90; i++) {
-    const date = dayjs().subtract(i, 'day').format('YYYY-MM-DD');
-    const dailyBookings = Math.floor(Math.random() * 5) + 1;
-    for (let j = 0; j < dailyBookings; j++) {
-      data.push({
-        date: date,
-        amount: (Math.random() * 2000000) + 500000,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        roomType: roomTypes[Math.floor(Math.random() * roomTypes.length)],
-        guests: Math.floor(Math.random() * 2) + 1,
-      });
-    }
-  }
-  return data;
-};
-const mockData = generateMockData();
-
-// --- Các khoảng thời gian chọn nhanh ---
 const rangePresets = [
   { label: 'Last 7 Days', value: [dayjs().subtract(7, 'd'), dayjs()] },
   { label: 'Last 14 Days', value: [dayjs().subtract(14, 'd'), dayjs()] },
@@ -40,80 +17,92 @@ const rangePresets = [
 ];
 
 const Dashboard = () => {
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState([]);
   const [dateRange, setDateRange] = useState([dayjs().subtract(30, 'days'), dayjs()]);
 
-  const filteredData = useMemo(() => {
-    if (!dateRange || !dateRange[0] || !dateRange[1]) return [];
-    const [start, end] = dateRange;
-    return mockData.filter(item => dayjs(item.date).isAfter(start.subtract(1, 'day')) && dayjs(item.date).isBefore(end.add(1, 'day')));
+  const fetchData = (dates) => {
+    if (!dates || dates.length !== 2) return;
+    setLoading(true);
+    const [start, end] = dates;
+
+    getDashboardData(start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'))
+      .then(data => {
+        setDashboardData(data || []);
+      })
+      .catch(() => {
+        message.error("Failed to load dashboard data.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchData(dateRange);
   }, [dateRange]);
 
-  const totalRevenue = filteredData.reduce((sum, item) => item.status !== 'CANCELLED' ? sum + item.amount : sum, 0);
-  const totalBookings = filteredData.length;
-  const totalGuests = filteredData.reduce((sum, item) => item.status !== 'CANCELLED' ? sum + item.guests : sum, 0);
+  const totalRevenue = useMemo(() =>
+    dashboardData.reduce((sum, item) => item.status !== 'CANCELLED' ? sum + item.amount : sum, 0),
+    [dashboardData]
+  );
+
+  const totalBookings = useMemo(() => dashboardData.length, [dashboardData]);
+
+  const totalGuests = useMemo(() =>
+    dashboardData.reduce((sum, item) => item.status !== 'CANCELLED' ? sum + item.guests : sum, 0),
+    [dashboardData]
+  );
 
   const revenueByDay = useMemo(() => {
     const daily = {};
-    filteredData.forEach(item => {
+    dashboardData.forEach(item => {
       if (item.status !== 'CANCELLED') {
         daily[item.date] = (daily[item.date] || 0) + item.amount;
       }
     });
     return Object.keys(daily).map(date => ({ date, revenue: daily[date] })).sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [filteredData]);
+  }, [dashboardData]);
 
   const bookingStatusData = useMemo(() => {
     const statusCount = {};
-    filteredData.forEach(item => {
+    dashboardData.forEach(item => {
       statusCount[item.status] = (statusCount[item.status] || 0) + 1;
     });
     return Object.keys(statusCount).map(status => ({ type: status, value: statusCount[status] }));
-  }, [filteredData]);
+  }, [dashboardData]);
 
   const revenueByRoomType = useMemo(() => {
     const roomRevenue = {};
-    filteredData.forEach(item => {
+    dashboardData.forEach(item => {
       if (item.status !== 'CANCELLED') {
         roomRevenue[item.roomType] = (roomRevenue[item.roomType] || 0) + item.amount;
       }
     });
     return Object.keys(roomRevenue).map(type => ({ roomType: type, revenue: roomRevenue[type] })).sort((a, b) => b.revenue - a.revenue);
-  }, [filteredData]);
+  }, [dashboardData]);
 
   const currencyFormatter = (value) => `${(value / 1000000).toFixed(1)}M VND`;
-
   const lineConfig = {
     data: revenueByDay, xField: 'date', yField: 'revenue', point: { shape: 'diamond' }, color: '#1976D2',
     yAxis: { label: { formatter: currencyFormatter } },
     tooltip: { formatter: (datum) => ({ name: 'Revenue', value: `${datum.revenue.toLocaleString()} VND` }) }
   };
-
   const pieConfig = {
-    appendPadding: 10,
-    data: bookingStatusData,
-    angleField: 'value',
-    colorField: 'type',
-    radius: 0.8,
+    appendPadding: 10, data: bookingStatusData, angleField: 'value', colorField: 'type', radius: 0.8,
     legend: { position: 'top' },
     label: {
       offset: '-50%',
       content: (data) => {
-        if (totalBookings === 0) {
-          return '';
-        }
+        if (totalBookings === 0) return '';
         const percent = (data.value / totalBookings) * 100;
         return percent > 5 ? `${percent.toFixed(0)}%` : '';
       },
-      style: {
-        fontSize: 14,
-        textAlign: 'center',
-        fill: '#fff',
-      },
+      style: { fontSize: 14, textAlign: 'center', fill: '#fff' },
     },
     interactions: [{ type: 'element-active' }],
     tooltip: { formatter: (datum) => ({ name: datum.type, value: `${datum.value} bookings` }) }
   };
-
   const columnConfig = {
     data: revenueByRoomType, xField: 'roomType', yField: 'revenue', color: '#4CAF50',
     yAxis: { label: { formatter: currencyFormatter } },
@@ -135,24 +124,30 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col xs={24} sm={12} lg={8}><Card><Statistic title="Total Revenue" value={totalRevenue} formatter={(value) => value.toLocaleString()} prefix={<DollarCircleOutlined />} suffix="VND" valueStyle={{ color: '#3f8600' }} /></Card></Col>
-        <Col xs={24} sm={12} lg={8}><Card><Statistic title="Total Bookings" value={totalBookings} prefix={<BookOutlined />} valueStyle={{ color: '#1890ff' }} /></Card></Col>
-        <Col xs={24} sm={24} lg={8}><Card><Statistic title="Total Guests" value={totalGuests} prefix={<UserOutlined />} valueStyle={{ color: '#cf1322' }} /></Card></Col>
+        <Col xs={24} sm={12} lg={8}><Card loading={loading}><Statistic title="Total Revenue" value={totalRevenue} formatter={(value) => value.toLocaleString()} prefix={<DollarCircleOutlined />} suffix="VND" valueStyle={{ color: '#3f8600' }} /></Card></Col>
+        <Col xs={24} sm={12} lg={8}><Card loading={loading}><Statistic title="Total Bookings" value={totalBookings} prefix={<BookOutlined />} valueStyle={{ color: '#1890ff' }} /></Card></Col>
+        <Col xs={24} sm={24} lg={8}><Card loading={loading}><Statistic title="Total Guests" value={totalGuests} prefix={<UserOutlined />} valueStyle={{ color: '#cf1322' }} /></Card></Col>
 
         <Col span={24}>
           <Card title="Revenue Over Time">
-            {revenueByDay.length > 0 ? <Line {...lineConfig} /> : <Empty />}
+            <Spin spinning={loading}>
+              {revenueByDay.length > 0 ? <Line {...lineConfig} /> : <Empty />}
+            </Spin>
           </Card>
         </Col>
 
         <Col xs={24} lg={10}>
           <Card title="Booking Status">
-            {bookingStatusData.length > 0 ? <Pie {...pieConfig} /> : <Empty />}
+            <Spin spinning={loading}>
+              {bookingStatusData.length > 0 ? <Pie {...pieConfig} /> : <Empty />}
+            </Spin>
           </Card>
         </Col>
         <Col xs={24} lg={14}>
           <Card title="Revenue by Room Type">
-            {revenueByRoomType.length > 0 ? <Column {...columnConfig} /> : <Empty />}
+            <Spin spinning={loading}>
+              {revenueByRoomType.length > 0 ? <Column {...columnConfig} /> : <Empty />}
+            </Spin>
           </Card>
         </Col>
       </Row>

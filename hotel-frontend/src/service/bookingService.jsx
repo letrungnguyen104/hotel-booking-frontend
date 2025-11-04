@@ -56,3 +56,8 @@ export const getReviewsByHotelId = async (hotelId) => {
   const response = await get(`reviews/hotel/${hotelId}`);
   return response.result;
 };
+
+export const getDashboardData = async (startDate, endDate) => {
+  const response = await get(`bookings/hotel-admin/dashboard?startDate=${startDate}&endDate=${endDate}`);
+  return response.result;
+};

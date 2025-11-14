@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkLogin } from "@/action/login";
 import { setUser, clearUser } from "@/action/user";
 import ClipLoader from "react-spinners/ClipLoader";
+import ForgotPassword from "@/pages/ForgotPassword/ForgotPassword";
 
 function Header() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function Header() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const [otpForm] = Form.useForm();
   const [pendingEmail, setPendingEmail] = useState(null);
   const [loadingRegister, setLoadingRegister] = useState(false);
@@ -310,6 +312,18 @@ function Header() {
           >
             <Input.Password placeholder="Enter your password" />
           </Form.Item>
+          <Form.Item>
+            <Button 
+              type="link" 
+              onClick={() => {
+                handleCloseLoginModal();
+                setIsForgotPasswordModalOpen(true);
+              }}
+              style={{ padding: 0, marginBottom: 8 }}
+            >
+              Forgot password?
+            </Button>
+          </Form.Item>
           <Button type="primary" htmlType="submit" block>
             Login
           </Button>
@@ -397,6 +411,11 @@ function Header() {
           </Button>
         </Form>
       </Modal>
+
+      <ForgotPassword 
+        isOpen={isForgotPasswordModalOpen}
+        onClose={() => setIsForgotPasswordModalOpen(false)}
+      />
     </>
   );
 }

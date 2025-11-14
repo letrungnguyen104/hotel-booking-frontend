@@ -132,7 +132,12 @@ const CheckoutPage = () => {
       }
 
     } catch (error) {
-      toast.error(error.response?.data?.message || "Booking failed. Please try again.");
+      const errorMessage = error.response?.data?.message || "Booking failed. Please try again.";
+      if (errorMessage.includes("Room not found") || errorMessage.includes("ROOM_NOT_FOUND")) {
+        toast.error("Sorry! The room you selected has been booked by someone else. Please go back and select another room!");
+      } else {
+        toast.error(errorMessage);
+      }
       setIsSubmitting(false);
     }
   };

@@ -12,7 +12,7 @@ const API_URL = "http://localhost:8081/auth/forgot-password";
 function ForgotPassword({ isOpen, onClose }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [email, setEmail] = useState("");
-  const [otpCode, setOtpCode] = useState(""); // Lưu OTP code
+  const [otpCode, setOtpCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailForm] = Form.useForm();
   const [otpForm] = Form.useForm();
@@ -21,12 +21,12 @@ function ForgotPassword({ isOpen, onClose }) {
   const handleSendOtp = async (values) => {
     try {
       setLoading(true);
-      
+
       // Call API to send OTP to email
       const response = await axios.post(`${API_URL}/send-otp`, {
         email: values.email
       });
-      
+
       setEmail(values.email);
       toast.success(response.data.result.message || "Verification code sent to your email!");
       setCurrentStep(1);
@@ -42,16 +42,16 @@ function ForgotPassword({ isOpen, onClose }) {
   const handleVerifyOtp = async (values) => {
     try {
       setLoading(true);
-      
+
       // Call API to verify OTP
       const response = await axios.post(`${API_URL}/verify-otp`, {
         email: email,
         code: values.code
       });
-      
+
       // Lưu OTP code để dùng ở bước reset password
       setOtpCode(values.code);
-      
+
       toast.success(response.data.result.message || "Verification code verified!");
       setCurrentStep(2);
     } catch (error) {
@@ -66,14 +66,14 @@ function ForgotPassword({ isOpen, onClose }) {
   const handleResetPassword = async (values) => {
     try {
       setLoading(true);
-      
+
       // Call API to reset password - GỬI CẢ EMAIL, CODE VÀ PASSWORD
       const response = await axios.post(`${API_URL}/reset-password`, {
         email: email,
         code: otpCode, // Gửi OTP code đã verify
         password: values.password
       });
-      
+
       toast.success(response.data.result.message || "Password reset successfully! Please login with your new password.");
       handleClose();
     } catch (error) {
@@ -88,11 +88,11 @@ function ForgotPassword({ isOpen, onClose }) {
   const handleResendOtp = async () => {
     try {
       setLoading(true);
-      
+
       const response = await axios.post(`${API_URL}/send-otp`, {
         email: email
       });
-      
+
       toast.success(response.data.result.message || "Verification code resent!");
       otpForm.resetFields();
     } catch (error) {
@@ -142,18 +142,18 @@ function ForgotPassword({ isOpen, onClose }) {
                 { type: 'email', message: 'Please enter a valid email!' }
               ]}
             >
-              <Input 
-                prefix={<MailOutlined />} 
-                placeholder="Enter your email address" 
+              <Input
+                prefix={<MailOutlined />}
+                placeholder="Enter your email address"
                 size="large"
               />
             </Form.Item>
             <Form.Item>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={loading} 
-                block 
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                block
                 size="large"
               >
                 Send Verification Code
@@ -161,7 +161,7 @@ function ForgotPassword({ isOpen, onClose }) {
             </Form.Item>
           </Form>
         );
-      
+
       case 1:
         return (
           <Form form={otpForm} onFinish={handleVerifyOtp} layout="vertical">
@@ -178,20 +178,20 @@ function ForgotPassword({ isOpen, onClose }) {
                 { pattern: /^[0-9]+$/, message: 'Verification code must contain only numbers!' }
               ]}
             >
-              <Input 
-                prefix={<SafetyOutlined />} 
-                placeholder="Enter 6-digit code" 
+              <Input
+                prefix={<SafetyOutlined />}
+                placeholder="Enter 6-digit code"
                 maxLength={6}
                 size="large"
                 style={{ letterSpacing: '0.5em', textAlign: 'center', fontSize: '18px' }}
               />
             </Form.Item>
             <Form.Item>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={loading} 
-                block 
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                block
                 size="large"
               >
                 Verify Code
@@ -199,8 +199,8 @@ function ForgotPassword({ isOpen, onClose }) {
             </Form.Item>
             <div style={{ textAlign: 'center' }}>
               <span style={{ color: '#666' }}>Didn't receive the code? </span>
-              <Button 
-                type="link" 
+              <Button
+                type="link"
                 onClick={handleResendOtp}
                 disabled={loading}
                 style={{ padding: 0 }}
@@ -210,7 +210,7 @@ function ForgotPassword({ isOpen, onClose }) {
             </div>
           </Form>
         );
-      
+
       case 2:
         return (
           <Form form={resetForm} onFinish={handleResetPassword} layout="vertical">
@@ -225,9 +225,9 @@ function ForgotPassword({ isOpen, onClose }) {
                 { min: 6, message: 'Password must be at least 6 characters!' }
               ]}
             >
-              <Input.Password 
-                prefix={<LockOutlined />} 
-                placeholder="Enter new password" 
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Enter new password"
                 size="large"
               />
             </Form.Item>
@@ -247,18 +247,18 @@ function ForgotPassword({ isOpen, onClose }) {
                 }),
               ]}
             >
-              <Input.Password 
-                prefix={<LockOutlined />} 
-                placeholder="Confirm new password" 
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Confirm new password"
                 size="large"
               />
             </Form.Item>
             <Form.Item>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                loading={loading} 
-                block 
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                block
                 size="large"
               >
                 Reset Password
@@ -266,7 +266,7 @@ function ForgotPassword({ isOpen, onClose }) {
             </Form.Item>
           </Form>
         );
-      
+
       default:
         return null;
     }
@@ -288,7 +288,7 @@ function ForgotPassword({ isOpen, onClose }) {
           <Step key={index} title={item.title} icon={item.icon} />
         ))}
       </Steps>
-      
+
       {renderStepContent()}
     </Modal>
   );

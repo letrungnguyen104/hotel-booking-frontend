@@ -6,6 +6,12 @@ export const createBooking = async (data) => {
   return response.result;
 };
 
+export const retryBookingPayment = async (bookingId) => {
+  console.log(`bookings/retry-payment/${bookingId}`);
+  const response = await post(`bookings/retry-payment/${bookingId}`);
+  return response.result;
+};
+
 export const getMyBookings = async () => {
   const response = await get('bookings/my-bookings');
   return response.result;

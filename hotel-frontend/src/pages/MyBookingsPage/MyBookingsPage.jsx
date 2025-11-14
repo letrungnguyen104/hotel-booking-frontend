@@ -1,10 +1,10 @@
 // src/pages/MyBookingsPage/MyBookingsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Spin, Empty, Tag, Button, Avatar, message, Space, Modal, List, Descriptions, Divider, Form, Input } from 'antd';
-import { EnvironmentOutlined, CalendarOutlined, EyeOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, CalendarOutlined, EyeOutlined, EditOutlined, CheckCircleOutlined, DollarCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { getMyBookings, cancelBooking } from '@/service/bookingService';
+import { getMyBookings, cancelBooking, retryBookingPayment } from '@/service/bookingService';
 import { toast } from 'sonner';
 import './MyBookingPage.scss';
 import ReviewModal from '@/components/ReviewModal/ReviewModal';
@@ -144,7 +144,7 @@ const BookingDetailModal = ({ booking, open, onClose }) => {
   );
 };
 
-const BookingCard = ({ booking, onViewDetails, onCancelBooking, onWriteReview }) => {
+const BookingCard = ({ booking, onViewDetails, onCancelBooking, onWriteReview, onRetryPayment }) => {
   const navigate = useNavigate();
   const totalNights = dayjs(booking.checkOutDate).diff(dayjs(booking.checkInDate), 'day');
 
@@ -187,6 +187,16 @@ const BookingCard = ({ booking, onViewDetails, onCancelBooking, onWriteReview })
         <div className="booking-card__footer">
           <span className="booking-card__price">Total: {booking.totalPrice.toLocaleString()} VND</span>
           <Space>
+            {booking.status === 'PENDING' && (
+              <Button
+                type="primary"
+                size="small"
+                icon={<DollarCircleOutlined />}
+                onClick={() => onRetryPayment(booking)}
+              >
+                Pay Now
+              </Button>
+            )}
             {(booking.status === 'CONFIRMED' || booking.status === 'PENDING') && (
               <Button danger size="small" onClick={() => onCancelBooking(booking)}>
                 Request Cancellation
@@ -217,6 +227,7 @@ const BookingCard = ({ booking, onViewDetails, onCancelBooking, onWriteReview })
 const MyBookingsPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isRetryingPayment, setIsRetryingPayment] = useState(false);
 
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -251,6 +262,30 @@ const MyBookingsPage = () => {
     setReviewModalOpen(true);
   };
 
+  const handleRetryPayment = async (booking) => {
+    setIsRetryingPayment(true);
+    try {
+      const response = await retryBookingPayment(booking.id);
+      if (response && response.paymentUrl) {
+        toast.success("Redirecting to payment gateway...");
+        window.location.href = response.paymentUrl;
+      } else {
+        toast.error("Could not create payment URL.");
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || "Failed to retry payment.";
+
+      if (errorMsg.includes("ROOM_NOT_FOUND") || errorMsg.includes("no longer available")) {
+        toast.error("Sorry, the rooms for this booking are no longer available and this booking has been cancelled.");
+        fetchMyBookings();
+      } else {
+        toast.error(errorMsg);
+      }
+    } finally {
+      setIsRetryingPayment(false);
+    }
+  };
+
   const handleCloseModals = () => {
     setDetailModalOpen(false);
     setCancelModalOpen(false);
@@ -274,17 +309,20 @@ const MyBookingsPage = () => {
       return <Empty description="No bookings found in this category." />;
     }
     return (
-      <div className="booking-list">
-        {data.map(booking => (
-          <BookingCard
-            key={booking.id}
-            booking={booking}
-            onViewDetails={handleViewDetails}
-            onCancelBooking={handleOpenCancelModal}
-            onWriteReview={handleOpenReviewModal}
-          />
-        ))}
-      </div>
+      <Spin spinning={isRetryingPayment} tip="Preparing payment...">
+        <div className="booking-list">
+          {data.map(booking => (
+            <BookingCard
+              key={booking.id}
+              booking={booking}
+              onViewDetails={handleViewDetails}
+              onCancelBooking={handleOpenCancelModal}
+              onWriteReview={handleOpenReviewModal}
+              onRetryPayment={handleRetryPayment}
+            />
+          ))}
+        </div>
+      </Spin>
     );
   };
 

@@ -1,0 +1,45 @@
+.support-page-admin {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  height: 100%;
+
+  .support-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  .ant-table-wrapper {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+}
+
+
+.inquiry-modal-content {
+  .guest-message {
+    background-color: #f9f9f9;
+    border-left: 4px solid #1677ff;
+    padding: 1rem;
+    margin: 0;
+    font-style: italic;
+    color: #555;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .ant-form-item-label {
+    label {
+      font-weight: 600;
+    }
+  }
+}

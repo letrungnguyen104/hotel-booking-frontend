@@ -1,7 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Contactpage.css";
+import { toast } from "sonner";
+import { post } from "@/utils/request";
+import { postPublic } from "@/utils/publicRequest";
 
 const Contactpage = () => {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+
+    setLoading(true);
+    setSuccess(false);
+
+    try {
+      const response = await postPublic("inquiries/public", formData);
+
+      toast.success(response.result || "Message sent successfully!");
+      setSuccess(true);
+      setFormData({ fullName: "", email: "", message: "" });
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      toast.error(error.response?.data?.message || "Failed to send message.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="contact-page">
       <div className="container">
@@ -11,37 +48,64 @@ const Contactpage = () => {
         </p>
 
         <div className="contact-content">
-          {/* Form liên hệ */}
           <div className="contact-form">
             <h2>Send us a message</h2>
-            <form>
+
+            {success && (
+              <div className="success-message">
+                <p>Thank you! Your message has been received. Our team will contact you via email shortly.</p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="name">Full Name</label>
-                <input type="text" id="name" placeholder="Your name" required />
+                <label htmlFor="fullName">Full Name</label>
+                <input
+                  type="text"
+                  id="fullName"
+                  placeholder="Your name"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label htmlFor="email">Email Address</label>
-                <input type="email" id="email" placeholder="Your email" required />
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="form-group">
                 <label htmlFor="message">Message</label>
-                <textarea id="message" rows="5" placeholder="Write your message..." required></textarea>
+                <textarea
+                  id="message"
+                  rows="5"
+                  placeholder="Write your message..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                ></textarea>
               </div>
 
-              <button type="submit" className="btn-submit">Send Message</button>
+              <button type="submit" className="btn-submit" disabled={loading}>
+                {loading ? "Sending..." : "Send Message"}
+              </button>
             </form>
           </div>
 
-          {/* Thông tin liên hệ */}
           <div className="contact-info">
             <h2>Contact Information</h2>
             <p><strong>📍 Address:</strong> 123 Nguyen Van Linh, Da Nang, Vietnam</p>
             <p><strong>📞 Phone:</strong> +84 123 456 789</p>
             <p><strong>✉️ Email:</strong> support@hotelbooking.com</p>
 
-            {/* Google Map (tuỳ chọn) */}
             <div className="map-container">
               <iframe
                 title="map"

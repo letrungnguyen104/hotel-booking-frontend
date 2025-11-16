@@ -1,55 +1,40 @@
-import { AdminChatActionTypes } from "@/action/adminChatActions";
+import { ChatActionTypes } from "@/action/chatActions";
 
 const initialState = {
   conversations: [],
   messages: [],
   onlineUsers: new Set(),
   activeChatPartnerId: null,
-  recipientId: null,
-  recipientName: null,
   isSocketConnected: false,
 };
 
-const adminChatReducer = (state = initialState, action) => {
+const chatReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'ADMIN_START_CHAT_WITH':
-      return {
-        ...state,
-        recipientId: action.payload.recipientId,
-        recipientName: action.payload.recipientName,
-      };
-    case 'ADMIN_CLEAR_CHAT_RECIPIENT':
-      return {
-        ...state,
-        recipientId: null,
-        recipientName: null,
-      };
-
-    case AdminChatActionTypes.ADMIN_SET_CONVERSATIONS:
+    case ChatActionTypes.SET_CONVERSATIONS:
       return {
         ...state,
         conversations: action.payload,
       };
 
-    case AdminChatActionTypes.ADMIN_SET_MESSAGES:
+    case ChatActionTypes.SET_MESSAGES:
       return {
         ...state,
         messages: action.payload,
       };
 
-    case AdminChatActionTypes.ADMIN_ADD_MESSAGE:
+    case ChatActionTypes.ADD_MESSAGE:
       return {
         ...state,
         messages: [...state.messages, action.payload]
       };
 
-    case AdminChatActionTypes.ADMIN_SET_ONLINE_USERS:
+    case ChatActionTypes.SET_ONLINE_USERS:
       return {
         ...state,
         onlineUsers: action.payload
       };
 
-    case AdminChatActionTypes.ADMIN_SET_CONVO_UNREAD:
+    case ChatActionTypes.SET_CONVO_UNREAD:
       return {
         ...state,
         conversations: state.conversations.map(c =>
@@ -57,13 +42,13 @@ const adminChatReducer = (state = initialState, action) => {
         )
       };
 
-    case AdminChatActionTypes.ADMIN_SET_ACTIVE_CHAT_PARTNER:
+    case ChatActionTypes.SET_ACTIVE_CHAT_PARTNER:
       return {
         ...state,
         activeChatPartnerId: action.payload
       };
 
-    case AdminChatActionTypes.ADMIN_UPDATE_CONVO_LIST: {
+    case ChatActionTypes.UPDATE_CONVO_LIST: {
       const { message, currentUserId } = action.payload;
 
       const partnerId = message.senderId === currentUserId
@@ -91,13 +76,14 @@ const adminChatReducer = (state = initialState, action) => {
         hotelId: message.hotelId
       };
 
+
       return {
         ...state,
         conversations: [newConvoData, ...updatedConvos]
       };
     }
 
-    case AdminChatActionTypes.ADMIN_SET_SOCKET_CONNECTED:
+    case ChatActionTypes.SET_SOCKET_CONNECTED:
       return {
         ...state,
         isSocketConnected: action.payload,
@@ -108,4 +94,4 @@ const adminChatReducer = (state = initialState, action) => {
   }
 };
 
-export default adminChatReducer;
+export default chatReducer;

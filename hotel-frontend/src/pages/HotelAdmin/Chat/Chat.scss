@@ -110,12 +110,14 @@ $background-light: #f8f9fa;
       align-items: center;
 
       .convo-last-message {
-        font-size: 0.9rem;
-        color: $text-light;
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        white-space: normal;
+        color: #888;
+        font-size: 14px;
       }
 
       .unread-badge {

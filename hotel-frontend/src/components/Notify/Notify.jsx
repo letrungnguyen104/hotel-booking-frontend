@@ -1,4 +1,3 @@
-// src/components/Notify/Notify.jsx
 import React, { useState, useEffect } from 'react';
 import { BellOutlined, CheckCircleOutlined, MailOutlined } from '@ant-design/icons';
 import { Badge, Button, Dropdown, Menu, Spin, Empty, Modal } from 'antd';
@@ -6,7 +5,8 @@ import { getMyNotifications, markAsRead, markAllAsRead } from '@/service/notific
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import "./Notify.scss";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAllRead, setNotifications, setOneRead } from '@/action/notificationActions';
 
 dayjs.extend(relativeTime);
 
@@ -40,7 +40,6 @@ const NotifyItem = ({ notification }) => {
 };
 
 function Notify() {
-  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -49,13 +48,19 @@ function Notify() {
 
   const isLogin = useSelector((state) => state.loginReducer);
 
-  const unreadCount = notifications.filter(n => n.status === 'UNREAD').length;
+  const dispatch = useDispatch();
+  const notifications = useSelector(
+    (state) => state.notificationReducer.notifications
+  );
+  const unreadCount = useSelector(
+    (state) => state.notificationReducer.unreadCount
+  );
 
   const fetchNotifications = async () => {
     setLoading(true);
     try {
       const data = await getMyNotifications();
-      setNotifications(data || []);
+      dispatch(setNotifications(data || []));
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
     } finally {
@@ -66,12 +71,10 @@ function Notify() {
   useEffect(() => {
     if (isLogin) {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 60000);
-      return () => clearInterval(interval);
     } else {
-      setNotifications([]);
+      dispatch(setNotifications([]));
     }
-  }, [isLogin]);
+  }, [isLogin, dispatch]);
 
 
   const handleItemClick = (notification) => {
@@ -80,18 +83,14 @@ function Notify() {
     setIsDropdownOpen(false);
     if (notification.status === 'UNREAD') {
       markAsRead(notification.id).then(updatedNotification => {
-        setNotifications(prev =>
-          prev.map(n => n.id === updatedNotification.id ? updatedNotification : n)
-        );
+        dispatch(setOneRead(updatedNotification));
       });
     }
   };
 
   const handleMarkAllRead = () => {
-    markAllAsRead().then(() => {
-      setNotifications(prev =>
-        prev.map(n => ({ ...n, status: 'READ' }))
-      );
+    markAsRead().then(() => {
+      dispatch(setAllRead());
     });
   };
 
@@ -100,7 +99,6 @@ function Notify() {
     setSelectedNotification(null);
   };
 
-  // Tạo menu items từ data
   const items = notifications.map(notification => ({
     key: notification.id,
     label: <NotifyItem notification={notification} />,

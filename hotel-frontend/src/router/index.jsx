@@ -27,12 +27,12 @@ import AdminHotelManagement from "@/components/Admin/AdminHotelManagement/AdminH
 import AdminReportManagement from "@/components/Admin/AdminReportManagement/AdminReportManagement";
 import AdminBusinessRegistrationManagement from "@/components/Admin/AdminBusinessRegistrationManagement/AdminBusinessRegistrationManagement";
 import AdminMessage from "@/components/Admin/AdminMessage/AdminMessage";
-import AdminNotification from "@/components/Admin/AdminNotification/AdminNotification";
 import Chat from "@/pages/HotelAdmin/Chat/Chat";
 import BookingSuccessPage from "@/pages/BookingSuccessPage/BookingSuccessPage";
 import BookingFailurePage from "@/pages/BookingFailurePage/BookingFailurePage";
 import MyBookingsPage from "@/pages/MyBookingsPage/MyBookingsPage";
 import PromotionManagement from "@/components/Admin/PromotionManagement/PromotionManagement";
+import Support from "@/components/Admin/Support/Support";
 
 
 export const route = [
@@ -78,7 +78,7 @@ export const route = [
       { path: "report-management", element: <AdminReportManagement /> },
       { path: "business-registration", element: <AdminBusinessRegistrationManagement /> },
       { path: "message", element: <AdminMessage /> },
-      { path: "notification", element: <AdminNotification /> },
+      { path: "support", element: <Support /> },
       { path: "promotion", element: <PromotionManagement /> },
     ]
   },

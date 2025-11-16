@@ -1,28 +1,29 @@
-// src/pages/Chat/Chat.jsx
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Input, Avatar, Spin, Empty, message, Badge, Menu, Dropdown } from 'antd';
 import { FlagOutlined } from '@ant-design/icons';
 import { Search, Paperclip, Smile, Send, Phone, MoreVertical } from 'lucide-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { getConversations, getChatHistory, getOnlineUsers } from '@/service/chatService';
 import './Chat.scss';
-import { getToken } from '@/service/tokenService';
 import ReportModal from '@/components/ReportModal/ReportModal';
 import { useDispatch, useSelector } from 'react-redux';
+import { sendMessage } from '@/service/websocketService';
+import {
+  setConversations,
+  setConversationUnread,
+  setMessages,
+  setOnlineUsers,
+  setActiveChatPartner
+} from '@/action/chatActions';
 
 dayjs.extend(relativeTime);
 
 const Chat = () => {
-  const [conversations, setConversations] = useState([]);
   const [selectedConvo, setSelectedConvo] = useState(null);
-  const [messages, setMessages] = useState([]);
   const [loadingConvos, setLoadingConvos] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [newMessage, setNewMessage] = useState('');
-  const [onlineUsers, setOnlineUsers] = useState(new Set());
   const [searchText, setSearchText] = useState('');
 
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -30,17 +31,14 @@ const Chat = () => {
 
   const dispatch = useDispatch();
   const userDetails = useSelector(state => state.userReducer);
-  const chatRecipient = useSelector(state => state.chatReducer);
 
+  const { conversations, messages, onlineUsers } = useSelector(state => state.chatReducer);
+
+  const chatRecipientId = useSelector(state => state.chatReducer.recipientId);
+  const chatRecipientHotelId = useSelector(state => state.chatReducer.hotelId);
+
+  const isSocketConnected = useSelector(state => state.chatReducer.isSocketConnected);
   const messageAreaRef = useRef(null);
-  const stompClientRef = useRef(null);
-  const selectedConvoRef = useRef(null);
-  const conversationsRef = useRef([]);
-  const onlineUsersRef = useRef(new Set());
-
-  useEffect(() => { selectedConvoRef.current = selectedConvo; }, [selectedConvo]);
-  useEffect(() => { conversationsRef.current = conversations; }, [conversations]);
-  useEffect(() => { onlineUsersRef.current = onlineUsers; }, [onlineUsers]);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -48,139 +46,72 @@ const Chat = () => {
     }, 50);
   };
 
-  const handleNewMessage = (receivedMessage) => {
-    const currentConvo = selectedConvoRef.current;
-    const currentUser = userDetails;
+  useEffect(() => {
+    if (userDetails) {
+      setLoadingConvos(true);
 
-    const partnerId = receivedMessage.senderId === currentUser.id
-      ? receivedMessage.receiverId
-      : receivedMessage.senderId;
-    const isMe = receivedMessage.senderId === currentUser.id;
+      getConversations()
+        .then(data => {
+          const convos = data || [];
+          dispatch(setConversations(convos));
 
-    setConversations(prevConvos => {
-      const convoToUpdate = prevConvos.find(c => c.conversationPartnerId === partnerId);
-      let updatedConvos = prevConvos.filter(c => c.conversationPartnerId !== partnerId);
-      const partnerName = isMe ? (receivedMessage.receiverFullName || receivedMessage.receiverUsername) : (receivedMessage.senderFullName || receivedMessage.senderUsername);
-      const partnerUsername = isMe ? receivedMessage.receiverUsername : receivedMessage.senderUsername;
+          if (chatRecipientId) {
+            const existingConvo = convos.find(c =>
+              c.conversationPartnerId === chatRecipientId &&
+              c.hotelId === chatRecipientHotelId
+            );
 
-      const newConvoData = {
-        ...(convoToUpdate || {}),
-        conversationPartnerId: partnerId,
-        conversationPartnerName: partnerName,
-        conversationPartnerUsername: partnerUsername,
-        conversationPartnerAvatar: convoToUpdate?.conversationPartnerAvatar || null,
-        lastMessage: isMe ? `Bạn: ${receivedMessage.message}` : receivedMessage.message,
-        timestamp: receivedMessage.sentAt,
-        unreadCount: (currentConvo?.conversationPartnerId === partnerId || isMe)
-          ? 0
-          : (convoToUpdate?.unreadCount || 0) + 1,
-        hotelId: receivedMessage.hotelId
-      };
-      return [newConvoData, ...updatedConvos];
-    });
+            if (existingConvo) {
+              handleSelectConvo(existingConvo);
+            } else {
+              const newConvo = {
+                conversationPartnerId: chatRecipientId,
+                conversationPartnerName: "New Chat",
+                conversationPartnerAvatar: null,
+                lastMessage: 'Start chatting...',
+                timestamp: new Date().toISOString(),
+                unreadCount: 0,
+                hotelId: chatRecipientHotelId,
+                conversationPartnerUsername: "New Chat"
+              };
+              dispatch(setConversations([newConvo, ...convos]));
+              handleSelectConvo(newConvo);
+            }
+            dispatch({ type: 'CLEAR_CHAT_RECIPIENT' });
+          }
+        })
+        .catch(() => message.error('Failed to load conversations.'))
+        .finally(() => setLoadingConvos(false));
 
-    if (currentConvo && (receivedMessage.senderId === currentConvo.conversationPartnerId || receivedMessage.receiverId === currentConvo.conversationPartnerId)) {
-      setMessages(prevMessages => [...prevMessages, receivedMessage]);
-      scrollToBottom();
+      getOnlineUsers()
+        .then(usernames => dispatch(setOnlineUsers(new Set(usernames))))
+        .catch(err => console.error("Failed to fetch initial online users", err));
     }
-  };
+  }, [userDetails, dispatch, chatRecipientId, chatRecipientHotelId]);
+
 
   useEffect(() => {
-    if (!userDetails || stompClientRef.current) return;
-    const token = getToken();
-    if (!token) {
-      message.error('Authentication token not found.');
-      return;
-    }
+    scrollToBottom();
+  }, [messages]);
 
-    const socket = new SockJS('http://localhost:8081/ws');
-    const client = new Client({
-      webSocketFactory: () => socket,
-      connectHeaders: { Authorization: `Bearer ${token}` },
-      reconnectDelay: 5000,
-      onConnect: async () => {
-        stompClientRef.current = client;
-
-        try {
-          const onlineUsernames = await getOnlineUsers();
-          setOnlineUsers(new Set(onlineUsernames));
-        } catch (err) {
-          console.error("Failed to fetch initial online users", err);
-        }
-
-        client.subscribe('/user/queue/messages', (message) => {
-          handleNewMessage(JSON.parse(message.body));
-        });
-        client.subscribe('/topic/presence', (message) => {
-          const presenceMessage = JSON.parse(message.body);
-          setOnlineUsers(prev => {
-            const newSet = new Set(prev);
-            if (presenceMessage.status === 'ONLINE') newSet.add(presenceMessage.username);
-            else newSet.delete(presenceMessage.username);
-            return newSet;
-          });
-        });
-
-        setLoadingConvos(true);
-        getConversations()
-          .then(data => {
-            const convos = data || [];
-            setConversations(convos);
-
-            if (chatRecipient.recipientId) {
-              const existingConvo = convos.find(c =>
-                c.conversationPartnerId === chatRecipient.recipientId &&
-                c.hotelId === chatRecipient.hotelId
-              );
-
-              if (existingConvo) {
-                handleSelectConvo(existingConvo);
-              } else {
-                const newConvo = {
-                  conversationPartnerId: chatRecipient.recipientId,
-                  conversationPartnerName: chatRecipient.recipientName,
-                  conversationPartnerAvatar: null,
-                  lastMessage: 'Start chatting...',
-                  timestamp: new Date().toISOString(),
-                  unreadCount: 0,
-                  hotelId: chatRecipient.hotelId, // Sẽ là null
-                  conversationPartnerUsername: chatRecipient.recipientName
-                };
-                setConversations(prev => [newConvo, ...prev]);
-                setSelectedConvo(newConvo);
-                setMessages([]);
-              }
-              dispatch({ type: 'CLEAR_CHAT_RECIPIENT' });
-            }
-          })
-          .catch(() => message.error('Failed to load conversations.'))
-          .finally(() => setLoadingConvos(false));
-      },
-      onStompError: (frame) => {
-        console.error('Broker reported error: ' + frame.headers['message']);
-      },
-    });
-
-    client.activate();
-
+  useEffect(() => {
     return () => {
-      if (stompClientRef.current) {
-        stompClientRef.current.deactivate();
-        stompClientRef.current = null;
-      }
+      dispatch(setActiveChatPartner(null));
+      dispatch(setMessages([]));
     };
-  }, [userDetails, dispatch, chatRecipient]);
+  }, [dispatch]);
 
   const handleSelectConvo = async (convo) => {
     setSelectedConvo(convo);
     setLoadingMessages(true);
-    setMessages([]);
+    dispatch(setMessages([]));
+
+    dispatch(setActiveChatPartner(convo.conversationPartnerId));
+
     try {
       const history = await getChatHistory(convo.conversationPartnerId, convo.hotelId);
-      setMessages(history || []);
-      setConversations(prev =>
-        prev.map(c => c.conversationPartnerId === convo.conversationPartnerId ? { ...c, unreadCount: 0 } : c)
-      );
+      dispatch(setMessages(history || []));
+      dispatch(setConversationUnread(convo.conversationPartnerId));
     } catch {
       message.error('Failed to load chat history.');
     } finally {
@@ -191,11 +122,10 @@ const Chat = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    const client = stompClientRef.current;
-    if (newMessage.trim() === '' || !client || !selectedConvo) return;
+    if (newMessage.trim() === '' || !selectedConvo) return;
 
-    if (!client.connected) {
-      message.error('Chat is not connected. Please wait or refresh the page.');
+    if (!userDetails) {
+      message.error("User not loaded. Cannot send message.");
       return;
     }
 
@@ -206,10 +136,7 @@ const Chat = () => {
       messageType: 'TEXT',
     };
 
-    client.publish({
-      destination: '/app/chat.private',
-      body: JSON.stringify(chatMessageRequest)
-    });
+    sendMessage('/app/chat.private', chatMessageRequest);
 
     setNewMessage('');
   };
@@ -342,11 +269,16 @@ const Chat = () => {
                 <button type="button" className="icon-btn"><Smile size={20} /></button>
                 <input
                   type="text"
-                  placeholder="Nhập tin nhắn..."
+                  placeholder={isSocketConnected ? "Nhập tin nhắn..." : "Đang kết nối..."}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
+                  disabled={!isSocketConnected}
                 />
-                <button type="submit" className="send-btn">
+                <button
+                  type="submit"
+                  className="send-btn"
+                  disabled={!isSocketConnected}
+                >
                   <Send size={20} />
                 </button>
               </form>

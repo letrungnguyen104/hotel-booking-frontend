@@ -4,9 +4,10 @@ import loginReducer from "./login"
 import userReducer from './user';
 import searchReducer from './search';
 import checkoutReducer from './checkout';
-import chatReducer from './chat';
 import adminChatReducer from './adminChatReducer';
 import uiReducer from './uiReducer';
+import notificationReducer from './notificationReducer';
+import chatReducer from './chatReducer';
 
 const allReducers = combineReducers({
   loginReducer,
@@ -15,7 +16,8 @@ const allReducers = combineReducers({
   checkoutReducer,
   chatReducer,
   adminChatReducer,
-  uiReducer
+  uiReducer,
+  notificationReducer,
 })
 
 export default allReducers

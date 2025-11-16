@@ -12,16 +12,17 @@ import {
 } from "@ant-design/icons";
 import { Dropdown, Space, Modal, Form, Input, Button } from "antd";
 import Notify from "../Notify/Notify";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { login } from "@/service/loginServices";
 import { getToken, getUserIdFromToken, setToken } from "@/service/tokenService";
 import { getUserById, preRegister, verifyRegister } from "@/service/userService";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, useStore } from "react-redux";
 import { checkLogin } from "@/action/login";
 import { setUser, clearUser } from "@/action/user";
 import ClipLoader from "react-spinners/ClipLoader";
 import ForgotPassword from "@/pages/ForgotPassword/ForgotPassword";
+import { connectWebSocket, disconnectWebSocket } from "@/service/websocketService";
 
 function Header() {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ function Header() {
   const [otpForm] = Form.useForm();
   const [pendingEmail, setPendingEmail] = useState(null);
   const [loadingRegister, setLoadingRegister] = useState(false);
+  const store = useStore();
 
   const isLogin = useSelector((state) => state.loginReducer);
   const userDetails = useSelector((state) => state.userReducer);
@@ -42,6 +44,9 @@ function Header() {
     (state) => state.uiReducer?.isLoginModalOpen
   );
   const dispatch = useDispatch();
+
+  // 2. Dùng ref để ngăn lặp
+  const connectionAttempted = useRef(false);
 
   const isHotelAdmin = userDetails?.roles?.some(
     (role) => role.roleName === "HOTEL_ADMIN"
@@ -70,28 +75,46 @@ function Header() {
 
   useEffect(() => {
     const token = getToken();
-    if (token) {
-      dispatch(checkLogin(true));
-      if (!userDetails) {
-        setLoadingUser(true);
-        const userId = getUserIdFromToken();
-        getUserById(userId)
-          .then((userPrf) => {
-            dispatch(setUser(userPrf));
-          })
-          .catch((err) => {
-            console.error("Failed to fetch user after reload:", err);
-          })
-          .finally(() => setLoadingUser(false));
-      } else {
-        setLoadingUser(false);
-      }
-    } else {
+
+    if (isLogin && token && userDetails && !connectionAttempted.current) {
+      setLoadingUser(false);
+      connectWebSocket(token, store, userDetails.id);
+      connectionAttempted.current = true;
+      console.log("WS connected on scenario 1: Login success");
+    }
+    else if (isLogin && token && !userDetails && !connectionAttempted.current) {
+      setLoadingUser(true);
+
+      const userId = getUserIdFromToken();
+      getUserById(userId)
+        .then((userPrf) => {
+          dispatch(setUser(userPrf));
+          connectWebSocket(token, store, userPrf.id);
+          connectionAttempted.current = true;
+          console.log("WS connected on scenario 2: Page reload");
+        })
+        .catch((err) => {
+          console.error("Token invalid, logging out:", err);
+          dispatch(checkLogin(false));
+          dispatch(clearUser());
+        })
+        .finally(() => setLoadingUser(false));
+    }
+    else if (!isLogin || !token) {
       dispatch(checkLogin(false));
       dispatch(clearUser());
       setLoadingUser(false);
+      disconnectWebSocket();
+      connectionAttempted.current = false;
     }
-  }, [dispatch, userDetails]);
+    else if (isLogin && !userDetails) {
+      setLoadingUser(true);
+    }
+    else {
+      setLoadingUser(false);
+    }
+  }, [dispatch, isLogin, userDetails, store]);
+
 
   useEffect(() => {
     if (isLoginModalVisible) {
@@ -108,29 +131,31 @@ function Header() {
     try {
       const response = await login(values);
       if (response.result) {
+        const token = response.result.token;
         loginForm.resetFields();
-        dispatch(checkLogin(true));
         toast.success("Login Successfully!");
-        setToken(response.result.token, 60);
+        setToken(token, 60);
 
         setLoadingUser(true);
         const userId = getUserIdFromToken();
         const userPrf = await getUserById(userId);
+
         dispatch(setUser(userPrf));
+        dispatch(checkLogin(true));
+
         setLoadingUser(false);
         handleCloseLoginModal();
 
         const isAdmin = userPrf?.roles?.some((role) => role.roleName === "ADMIN");
-
         if (isAdmin) {
           navigate("/admin");
         }
       } else {
-        toast.error("Login failed!");
+        toast.error(response.message || "Login failed!");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Login failed!");
+      toast.error(error.response?.data?.message || "Login failed!");
     }
   };
 
@@ -178,6 +203,7 @@ function Header() {
   };
 
   const handleLogout = () => {
+    disconnectWebSocket();
     dispatch(checkLogin(false));
     dispatch(clearUser());
     toast.info("You have been logged out!");
@@ -313,8 +339,8 @@ function Header() {
             <Input.Password placeholder="Enter your password" />
           </Form.Item>
           <Form.Item>
-            <Button 
-              type="link" 
+            <Button
+              type="link"
               onClick={() => {
                 handleCloseLoginModal();
                 setIsForgotPasswordModalOpen(true);
@@ -412,7 +438,7 @@ function Header() {
         </Form>
       </Modal>
 
-      <ForgotPassword 
+      <ForgotPassword
         isOpen={isForgotPasswordModalOpen}
         onClose={() => setIsForgotPasswordModalOpen(false)}
       />

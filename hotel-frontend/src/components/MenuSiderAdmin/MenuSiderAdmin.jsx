@@ -58,9 +58,9 @@ function MenuSiderAdmin({ collapsed }) {
       key: "message",
     },
     {
-      label: <Link to="/admin/notification">Notification</Link>,
+      label: <Link to="/admin/support">Support</Link>,
       icon: <NotificationOutlined />,
-      key: "notification",
+      key: "support",
     },
   ];
 

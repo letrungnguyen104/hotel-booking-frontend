@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   Table,
   Button,
@@ -11,6 +12,7 @@ import {
   Upload,
   message,
   Space,
+  Divider
 } from "antd";
 import {
   PlusOutlined,
@@ -23,9 +25,8 @@ import {
   FilterOutlined,
 } from "@ant-design/icons";
 import { getRoomTypesByHotel, getRoomTypesByHotelForHotelAdmin } from "@/service/roomTypeService";
-import { getAmenities } from "@/service/amenityService";
+import { createAmenity, getAmenities } from "@/service/amenityService";
 import "./RoomTypeTab.scss";
-import { toast } from "sonner";
 import { updateRoomType } from "@/service/roomTypeService";
 import { createRoomType } from "@/service/roomTypeService";
 import Swal from 'sweetalert2/dist/sweetalert2.js'
@@ -40,10 +41,14 @@ const RoomTypeTab = ({ hotelId }) => {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [amenities, setAmenities] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [newAmenityName, setNewAmenityName] = useState("");
+  const [isAddingAmenity, setIsAddingAmenity] = useState(false);
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingType, setEditingType] = useState(null);
   const [fileList, setFileList] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false); // State mới cho loading button
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form] = Form.useForm();
 
   const statusColor = {
@@ -82,6 +87,31 @@ const RoomTypeTab = ({ hotelId }) => {
       fetchAmenities();
     }
   }, [hotelId]);
+
+  const handleAddNewAmenity = async () => {
+    if (!newAmenityName) return;
+
+    setIsAddingAmenity(true);
+    try {
+      const newAmenity = await createAmenity({ name: newAmenityName });
+
+      if (newAmenity) {
+        toast.success(`Amenity "${newAmenity.name}" added!`);
+        setNewAmenityName("");
+
+        await fetchAmenities();
+
+        const currentAmenities = form.getFieldValue("amenityIds") || [];
+        form.setFieldsValue({
+          amenityIds: [...currentAmenities, newAmenity.id],
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsAddingAmenity(false);
+    }
+  };
 
   const handleFilterChange = (value) => {
     setStatusFilter(value);
@@ -138,7 +168,7 @@ const RoomTypeTab = ({ hotelId }) => {
       const res = await createRoomType(formData);
       if (res) {
         toast.success("Room type created successfully!");
-        fetchRoomTypes(); // Tải lại danh sách
+        fetchRoomTypes();
         setIsModalVisible(false);
       } else {
         message.error("Failed to create room type");
@@ -358,15 +388,14 @@ const RoomTypeTab = ({ hotelId }) => {
         onCancel={() => setIsModalVisible(false)}
         onOk={editingType ? handleUpdateRoomType : handleCreateRoomType}
         width={700}
-        okButtonProps={{ loading: isSubmitting }} // Thêm prop này
-        destroyOnClose // Thêm prop này để tự reset form
+        okButtonProps={{ loading: isSubmitting }}
+        destroyOnClose
       >
         <Form
           form={form}
           layout="vertical"
           initialValues={{ status: "ACTIVE", capacity: 2 }}
         >
-          {/* Các Form.Item giữ nguyên */}
           <Form.Item
             name="name"
             label="Room Type Name"
@@ -408,7 +437,9 @@ const RoomTypeTab = ({ hotelId }) => {
           <Form.Item
             name="amenityIds"
             label="Amenities"
-            rules={[{ required: true, message: "Please select at least one amenity" }]}
+            rules={[
+              { required: true, message: "Please select at least one amenity" },
+            ]}
           >
             <Select
               mode="multiple"
@@ -417,6 +448,28 @@ const RoomTypeTab = ({ hotelId }) => {
                 label: a.name,
                 value: a.id,
               }))}
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider style={{ margin: "8px 0" }} />
+                  <Space style={{ padding: "0 8px 4px" }}>
+                    <Input
+                      placeholder="Add new amenity"
+                      value={newAmenityName}
+                      onChange={(e) => setNewAmenityName(e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                    <Button
+                      type="text"
+                      icon={<PlusOutlined />}
+                      loading={isAddingAmenity}
+                      onClick={handleAddNewAmenity}
+                    >
+                      Add
+                    </Button>
+                  </Space>
+                </>
+              )}
             />
           </Form.Item>
 

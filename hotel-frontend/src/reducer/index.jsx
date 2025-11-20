@@ -1,4 +1,4 @@
-//index reducer
+//reducer/index
 import { combineReducers } from 'redux';
 import loginReducer from "./login"
 import userReducer from './user';

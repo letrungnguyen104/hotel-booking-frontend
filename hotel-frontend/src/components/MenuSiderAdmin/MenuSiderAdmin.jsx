@@ -10,7 +10,8 @@ import {
   SolutionOutlined,
   FireOutlined,
   BlockOutlined,
-  IssuesCloseOutlined
+  IssuesCloseOutlined,
+  BankOutlined
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -20,6 +21,11 @@ function MenuSiderAdmin({ collapsed }) {
       label: <Link to="/admin/dashboard">Dashboard</Link>,
       icon: <DashboardOutlined />,
       key: "dashboard",
+    },
+    {
+      label: <Link to="/admin/withdrawals">With Drawals</Link>,
+      icon: <BankOutlined />,
+      key: "withdrawals",
     },
     {
       label: "Management",

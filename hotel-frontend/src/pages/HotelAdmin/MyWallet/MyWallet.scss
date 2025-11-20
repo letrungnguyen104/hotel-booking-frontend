@@ -1,0 +1,165 @@
+@use "sass:color";
+
+$primary-color: #1677ff;
+$success-color: #52c41a;
+$bg-color: #f0f2f5;
+$card-bg: #ffffff;
+$text-primary: #1f1f1f;
+$text-secondary: #8c8c8c;
+$radius: 16px;
+$shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+
+.my-wallet-page {
+  padding: 24px;
+  background-color: $bg-color;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: 24px;
+  }
+
+  .balance-card {
+    background: linear-gradient(135deg, #ffffff 0%, #fcfcfc 100%);
+    border-radius: $radius;
+    box-shadow: $shadow;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    transition: transform 0.2s;
+    height: 100%;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+
+    .ant-card-body {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .ant-statistic-title {
+      font-size: 16px;
+      color: $text-secondary;
+      margin-bottom: 12px;
+    }
+
+    .ant-statistic-content {
+      .ant-statistic-content-value {
+        font-size: 42px !important;
+        font-weight: 800;
+        color: $success-color;
+        letter-spacing: -1px;
+      }
+
+      .ant-statistic-content-prefix,
+      .ant-statistic-content-suffix {
+        font-size: 24px;
+        color: $success-color;
+        font-weight: 600;
+      }
+    }
+
+    .withdraw-btn {
+      margin-top: 24px;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.2);
+
+      &:disabled {
+        background-color: #f5f5f5;
+        border-color: #d9d9d9;
+        color: rgba(0, 0, 0, 0.25);
+        box-shadow: none;
+      }
+    }
+
+    .min-withdraw-note {
+      margin-top: 16px;
+      color: $text-secondary;
+      font-size: 13px;
+      background: #f9f9f9;
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+  }
+
+  .history-card {
+    border-radius: $radius;
+    box-shadow: $shadow;
+    border: none;
+
+    .ant-card-head {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 0 24px;
+      min-height: 60px;
+
+      .ant-card-head-title {
+        font-size: 18px;
+        font-weight: 600;
+
+        .anticon {
+          margin-right: 8px;
+          color: $primary-color;
+        }
+      }
+    }
+
+    .ant-table-wrapper {
+      .ant-table-thead>tr>th {
+        background: #fafafa;
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      .ant-table-row {
+        &:hover>td {
+          background-color: #fbfbfb;
+        }
+      }
+    }
+
+    .amount-negative {
+      color: #ff4d4f;
+      font-weight: 700;
+      font-family: monospace;
+      font-size: 15px;
+    }
+
+    .bank-info {
+      .bank-name {
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      .bank-detail {
+        font-size: 12px;
+        color: $text-secondary;
+        margin-top: 2px;
+      }
+    }
+
+    .date-text {
+      color: $text-secondary;
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .my-wallet-page {
+    padding: 16px;
+
+    .balance-card {
+      margin-bottom: 24px;
+    }
+  }
+}

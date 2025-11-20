@@ -1,5 +1,5 @@
 import { Menu } from "antd";
-import { AppstoreOutlined, DashboardOutlined, FormOutlined, SignatureOutlined } from "@ant-design/icons";
+import { AppstoreOutlined, CreditCardOutlined, DashboardOutlined, DollarOutlined, FormOutlined, SignatureOutlined } from "@ant-design/icons";
 import { Link } from "react-router";
 
 function MenuSider() {
@@ -8,6 +8,16 @@ function MenuSider() {
       label: <Link to="/hotel-admin-dashboard/dashboard">Dashboard</Link>,
       icon: <DashboardOutlined />,
       key: "dashboard",
+    },
+    {
+      label: <Link to="/hotel-admin-dashboard/wallet">My Wallet</Link>,
+      icon: <CreditCardOutlined />,
+      key: "wallet",
+    },
+    {
+      label: <Link to="/hotel-admin-dashboard/payment-history">Payment History</Link>,
+      icon: <DollarOutlined />,
+      key: "payment-history",
     },
     {
       label: <Link to="/hotel-admin-dashboard/hotel-management">Hotel Management</Link>,

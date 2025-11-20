@@ -1,0 +1,77 @@
+@use "sass:color";
+
+$primary-color: #1677ff;
+$bg-color: #f5f5f5;
+$text-color: #333;
+$text-secondary: #666;
+
+.amenity-management {
+  padding: 24px;
+  background-color: $bg-color;
+  min-height: 100vh;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: $text-color;
+      margin: 0;
+    }
+
+    .page-subtitle {
+      color: $text-secondary;
+      margin: 4px 0 0 0;
+      font-size: 14px;
+    }
+  }
+
+  .table-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+    .table-toolbar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .ant-table-thead>tr>th {
+      background: #fafafa;
+      font-weight: 600;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .amenity-management {
+    padding: 16px;
+
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    .table-toolbar {
+      flex-direction: column;
+      gap: 12px;
+
+      .ant-input-affix-wrapper {
+        width: 100% !important;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

@@ -1,7 +1,29 @@
-// src/components/Admin/AdminUserManagement/AdminUserManagement.jsx
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Space, Tag, message, Card, Row, Col } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, MessageOutlined } from '@ant-design/icons';
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Space,
+  Tag,
+  message,
+  Card,
+  Row,
+  Col,
+  Dropdown,
+  Menu
+} from 'antd';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  UserOutlined,
+  MessageOutlined,
+  ExportOutlined,
+  FileExcelOutlined
+} from '@ant-design/icons';
 import { getAllUsers, adminCreateUser, adminUpdateUser, adminDeleteUser } from '@/service/userService';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
@@ -9,6 +31,10 @@ import './AdminUserManagement.scss';
 import { getProvinces } from '@/service/locationService';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
+import dayjs from 'dayjs';
+
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const { Option } = Select;
 const { Search } = Input;
@@ -66,6 +92,41 @@ const AdminUserManagement = () => {
     );
     setFilteredUsers(filtered);
   };
+
+  const handleExport = (fileType) => {
+    const dataToExport = filteredUsers.map((user) => ({
+      ID: user.id,
+      Username: user.username,
+      "Full Name": user.fullName,
+      Email: user.email,
+      Phone: user.phoneNumber,
+      Address: user.address,
+      Status: user.status === 1 ? "ACTIVE" : "INACTIVE",
+      Roles: user.roles.map(r => r.roleName).join(", "),
+      "Created At": user.createdAt ? dayjs(user.createdAt).format("DD/MM/YYYY HH:mm") : ""
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "User List");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    const fileName = `User_List_${dayjs().format("YYYYMMDD_HHmmss")}.xlsx`;
+    saveAs(data, fileName);
+
+    toast.success("User list exported successfully!");
+  };
+
+  const exportMenu = (
+    <Menu onClick={({ key }) => handleExport(key)}>
+      <Menu.Item key="xlsx" icon={<FileExcelOutlined />}>
+        Export to Excel (.xlsx)
+      </Menu.Item>
+    </Menu>
+  );
 
   const handleAdd = () => {
     setEditingUser(null);
@@ -174,11 +235,19 @@ const AdminUserManagement = () => {
 
   return (
     <div className="admin-user-management">
-      <Card title="User Management" extra={
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-          Create User
-        </Button>
-      }>
+      <Card
+        title="User Management"
+        extra={
+          <Space>
+            <Dropdown overlay={exportMenu} trigger={['click']}>
+              <Button icon={<ExportOutlined />}>Export Data</Button>
+            </Dropdown>
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+              Create User
+            </Button>
+          </Space>
+        }
+      >
         <Search
           placeholder="Search by username, email, or name..."
           onSearch={handleSearch}

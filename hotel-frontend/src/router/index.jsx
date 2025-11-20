@@ -33,6 +33,8 @@ import BookingFailurePage from "@/pages/BookingFailurePage/BookingFailurePage";
 import MyBookingsPage from "@/pages/MyBookingsPage/MyBookingsPage";
 import PromotionManagement from "@/components/Admin/PromotionManagement/PromotionManagement";
 import Support from "@/components/Admin/Support/Support";
+import AmenityManagement from "@/components/Admin/AmenityManagement/AmenityManagement";
+import AuditLog from "@/components/Admin/AuditLog/AuditLog";
 
 
 export const route = [
@@ -80,6 +82,8 @@ export const route = [
       { path: "message", element: <AdminMessage /> },
       { path: "support", element: <Support /> },
       { path: "promotion", element: <PromotionManagement /> },
+      { path: "amenity", element: <AmenityManagement /> },
+      { path: "auditlog", element: <AuditLog /> },
     ]
   },
 ];

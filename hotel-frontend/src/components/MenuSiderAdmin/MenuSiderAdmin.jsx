@@ -1,4 +1,3 @@
-// src/components/MenuSiderAdmin/MenuSiderAdmin.jsx
 import { Menu } from "antd";
 import {
   DashboardOutlined,
@@ -9,7 +8,9 @@ import {
   NotificationOutlined,
   AppstoreOutlined,
   SolutionOutlined,
-  FireOutlined
+  FireOutlined,
+  BlockOutlined,
+  IssuesCloseOutlined
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
@@ -50,6 +51,11 @@ function MenuSiderAdmin({ collapsed }) {
           icon: <FireOutlined />,
           key: "promotion",
         },
+        {
+          label: <Link to="/admin/amenity">Amenity</Link>,
+          icon: <BlockOutlined />,
+          key: "amenity",
+        },
       ]
     },
     {
@@ -61,6 +67,11 @@ function MenuSiderAdmin({ collapsed }) {
       label: <Link to="/admin/support">Support</Link>,
       icon: <NotificationOutlined />,
       key: "support",
+    },
+    {
+      label: <Link to="/admin/auditlog">System Log</Link>,
+      icon: <IssuesCloseOutlined />,
+      key: "auditlog",
     },
   ];
 

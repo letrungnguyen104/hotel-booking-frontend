@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, Rate, Slider, Tag, Spin, Result, Pagination, Collapse, Checkbox, Space, Row, Col } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { searchHotels } from '@/service/hotelService';
+// 1. IMPORT SERVICE
+import { getAmenities } from '@/service/amenityService';
 import Search from '@/components/Search/Search';
 import "./ListRoomSearch.scss";
 import { useSelector } from 'react-redux';
@@ -18,6 +20,9 @@ const ListRoomSearch = () => {
   const [originalHotels, setOriginalHotels] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // 2. THÊM STATE CHO AMENITIES
+  const [availableAmenities, setAvailableAmenities] = useState([]);
+
   const [filters, setFilters] = useState({
     priceRange: [0, 10000000],
     starRating: [],
@@ -26,6 +31,22 @@ const ListRoomSearch = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
+
+  // 3. THÊM USE EFFECT ĐỂ TẢI DANH SÁCH AMENITY
+  useEffect(() => {
+    getAmenities()
+      .then(data => {
+        // Chuyển đổi dữ liệu API thành format mà Checkbox.Group cần
+        // Giả sử API trả về [{id: 1, name: 'Wifi'}, ...]
+        // Chúng ta dùng 'name' làm value để khớp với logic filter hiện tại
+        const options = (data || []).map(item => ({
+          label: item.name,
+          value: item.name
+        }));
+        setAvailableAmenities(options);
+      })
+      .catch(err => console.error("Failed to load amenities:", err));
+  }, []);
 
   useEffect(() => {
     const { city, guests, dates } = searchState;
@@ -61,7 +82,10 @@ const ListRoomSearch = () => {
     return originalHotels.filter(hotel => {
       const priceCondition = hotel.newPrice >= filters.priceRange[0] && hotel.newPrice <= filters.priceRange[1];
       const starCondition = filters.starRating.length === 0 || filters.starRating.includes(Math.round(hotel.stars));
+
+      // Logic filter giữ nguyên: so sánh tên amenity
       const amenitiesCondition = filters.amenities.length === 0 || filters.amenities.every(amenity => hotel.amenities?.includes(amenity));
+
       return priceCondition && starCondition && amenitiesCondition;
     });
   }, [originalHotels, filters]);
@@ -170,9 +194,10 @@ const ListRoomSearch = () => {
               </Checkbox.Group>
             </Panel>
             <Panel header="Amenities" key="3">
+              {/* 4. CẬP NHẬT CHECKBOX GROUP ĐỂ DÙNG STATE MỚI */}
               <Checkbox.Group
                 style={{ width: '100%' }}
-                options={['WiFi', 'Pool', 'Restaurant', 'Parking', 'Spa', 'Fitness Center']}
+                options={availableAmenities}
                 value={filters.amenities}
                 onChange={(value) => handleFilterChange('amenities', value)}
               />

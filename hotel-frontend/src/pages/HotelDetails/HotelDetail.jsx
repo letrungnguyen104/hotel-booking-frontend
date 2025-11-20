@@ -18,6 +18,7 @@ import {
   CheckCircleOutlined,
   MessageOutlined,
   FlagOutlined,
+  UserOutlined
 } from "@ant-design/icons";
 import { getHotelById } from "@/service/hotelService";
 import {
@@ -33,7 +34,6 @@ import dayjs from "dayjs";
 import HotelReviews from "@/components/HotelReview/HotelReviews";
 import ReportModal from "@/components/ReportModal/ReportModal";
 
-// --- COMPONENT CON: RoomSelectionPanel ---
 const RoomSelectionPanel = ({ roomType, hotelId, onAddToCart }) => {
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
@@ -93,7 +93,6 @@ const RoomSelectionPanel = ({ roomType, hotelId, onAddToCart }) => {
   );
 };
 
-// --- COMPONENT CON: BookingSummary ---
 const BookingSummary = ({ cart, onRemoveItem, onCheckout }) => {
   if (cart.length === 0) return null;
 
@@ -452,6 +451,10 @@ const HotelDetail = () => {
                       </Col>
                       <Col xs={24} md={10}>
                         <h4>{rt.name}</h4>
+                        <p style={{ color: '#555', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <UserOutlined style={{ color: '#1890ff' }} />
+                          Max {rt.capacity} people
+                        </p>
                         <p>{rt.description}</p>
                         <div className="amenities-list">
                           {rt.amenities?.slice(0, 4).map((amenity) => (

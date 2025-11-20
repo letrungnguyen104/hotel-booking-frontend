@@ -1,75 +1,294 @@
+// Định nghĩa biến màu (giữ đồng bộ với theme của bạn)
+$primary-color: #0071c2;
+$bg-color: #f8f9fa;
+$text-color: #2d3748;
+$text-light: #718096;
+$border-radius: 12px;
+
 .main-content {
   display: flex;
-  gap: 20px;
-  padding: 20px;
+  gap: 24px; // Tăng khoảng cách giữa sidebar và list
+  padding: 24px;
+  background-color: $bg-color;
+  align-items: flex-start; // Quan trọng để sidebar sticky hoạt động
 }
 
-.hotel-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+// --- SIDEBAR FILTER (Được làm mới) ---
+.sidebar {
+  width: 300px; // Mở rộng chiều rộng một chút
+  background: #fff;
+  border-radius: 16px; // Bo góc mềm mại hơn
+  padding: 24px;
+  // Đổ bóng mềm mại, hiện đại thay vì border cứng
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.02);
 
-.hotel-card {
-  transition: box-shadow 0.3s ease;
-  border-radius: 8px; // Thêm bo góc cho card
+  // Giúp sidebar trượt theo khi cuộn trang
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
 
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  // Ẩn thanh cuộn của sidebar cho gọn
+  &::-webkit-scrollbar {
+    width: 4px;
   }
 
-  // Sử dụng layout của antd bên trong
+  &::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 4px;
+  }
+
+  .sidebar-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: $text-color;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 20px;
+      background-color: $primary-color;
+      margin-right: 10px;
+      border-radius: 2px;
+    }
+  }
+
+  // Tùy biến lại Collapse của Ant Design
+  .ant-collapse {
+    background: transparent;
+    border: none;
+
+    .ant-collapse-item {
+      border-bottom: 1px solid #f5f5f5;
+      margin-bottom: 8px;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .ant-collapse-header {
+        padding: 12px 0;
+        font-weight: 600;
+        font-size: 16px;
+        color: $text-color;
+
+        .ant-collapse-arrow {
+          font-size: 12px;
+          color: $text-light;
+        }
+      }
+
+      .ant-collapse-content {
+        border-top: none;
+
+        .ant-collapse-content-box {
+          padding: 0 0 16px 0;
+        }
+      }
+    }
+  }
+
+  // Style cho Slider giá
+  .ant-slider {
+    margin: 14px 6px 24px; // Tạo khoảng trống cho handle
+
+    .ant-slider-track {
+      background-color: $primary-color;
+    }
+
+    .ant-slider-handle {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+
+      &::after {
+        box-shadow: 0 0 0 2px $primary-color;
+      }
+    }
+  }
+
+  .price-display {
+    background-color: #f0f7ff;
+    color: $primary-color;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid rgba($primary-color, 0.1);
+  }
+
+  // Style cho Checkbox Group
+  .ant-checkbox-wrapper {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-bottom: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    font-size: 15px;
+    color: #4a5568;
+
+    &:hover {
+      background-color: #f7fafc;
+    }
+
+    .ant-checkbox-checked .ant-checkbox-inner {
+      background-color: $primary-color;
+      border-color: $primary-color;
+    }
+
+    // Canh chỉnh icon sao cho đẹp
+    .ant-rate {
+      font-size: 14px;
+      margin-left: 4px;
+      color: #fadb14;
+    }
+  }
+}
+
+// --- HOTEL LIST (Giữ nguyên nhưng tinh chỉnh nhẹ) ---
+.hotel-list-section {
+  flex: 1;
+  // Không cần background trắng ở container cha, để các card nổi bật trên nền xám
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+
+  .list-header {
+    margin-bottom: 20px;
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: $text-color;
+
+      span {
+        color: $text-light;
+        font-weight: normal;
+        font-size: 16px;
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .hotel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    margin-bottom: 20px;
+  }
+}
+
+// --- HOTEL CARD (Làm đẹp thêm) ---
+.hotel-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
   .ant-card-body {
     padding: 20px;
   }
 
-  // Cột ảnh
   .hotel-card__left {
     position: relative;
     width: 100%;
+    height: 220px; // Cố định chiều cao ảnh
 
     img {
       width: 100%;
-      height: 200px;
+      height: 100%;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 12px;
+      transition: transform 0.3s;
+    }
+
+    // Hiệu ứng zoom nhẹ khi hover
+    &:hover img {
+      transform: scale(1.02);
     }
 
     .hotel-card__score {
       position: absolute;
-      top: 10px; // Đẩy lên góc trên bên trái cho đẹp
-      left: 10px;
-      background: #0071c2;
+      top: 12px;
+      right: 12px; // Đổi sang phải cho hiện đại
+      left: auto;
+      background: $primary-color;
       color: #fff;
-      padding: 5px 8px;
-      border-radius: 4px;
-      font-weight: bold;
+      padding: 6px 10px;
+      border-radius: 8px 8px 8px 0;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
   }
 
-  // Cột thông tin (giữa)
   .hotel-card__middle {
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding-right: 16px;
 
     .hotel-card__header {
       .hotel-card__title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 4px;
+        font-size: 22px;
+        font-weight: 700;
+        color: $text-color;
+        margin-bottom: 8px;
+        line-height: 1.2;
+
+        // Cắt dòng nếu tên quá dài
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
     }
 
     .hotel-card__location {
-      color: #555;
-      margin-bottom: 12px;
+      color: $text-light;
+      margin-bottom: 16px;
       font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .hotel-card__offers {
-      margin-top: auto; // Đẩy tiện ích xuống dưới
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .ant-tag {
+        border: none;
+        background: #e6f7ff;
+        color: $primary-color;
+        font-weight: 500;
+        border-radius: 4px;
+        padding: 2px 8px;
+        margin-right: 0;
+      }
     }
   }
 
@@ -77,19 +296,19 @@
     text-align: right;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
+    justify-content: flex-end; // Đẩy giá xuống dưới cùng
     height: 100%;
+    border-left: 1px solid #f0f0f0; // Thêm đường kẻ phân cách
+    padding-left: 24px;
 
     .hotel-card__review {
+      margin-bottom: auto; // Đẩy lên trên cùng
       font-size: 14px;
-      font-weight: 600;
-      color: #333;
+      color: $text-light;
 
-      .review-count {
-        font-size: 13px;
-        font-weight: normal;
-        color: #555;
+      span {
+        display: block;
+        margin-top: 4px;
       }
     }
 
@@ -97,124 +316,61 @@
       .old-price {
         display: block;
         text-decoration: line-through;
-        color: #999;
+        color: #a0aec0;
         font-size: 14px;
+        margin-bottom: 4px;
       }
 
       .new-price {
-        font-size: 22px;
-        font-weight: bold;
-        color: #e74c3c;
+        font-size: 26px;
+        font-weight: 800;
+        color: $text-color;
+        letter-spacing: -0.5px;
       }
+
+      &::after {
+        content: 'per night';
+        display: block;
+        font-size: 12px;
+        color: $text-light;
+        font-weight: normal;
+      }
+    }
+
+    // Nút xem chi tiết (nếu muốn thêm sau này)
+    .view-deal-btn {
+      margin-top: 12px;
     }
   }
 }
 
-.sidebar {
-  width: 260px;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-  .sidebar-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 16px;
+// Responsive
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    padding: 16px;
   }
 
-  .filter-group {
-    margin-bottom: 20px;
+  .sidebar {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
 
-    h4 {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      color: #444;
-
-      input {
-        margin-right: 8px;
-      }
-    }
-
-    .price-inputs {
-      display: flex;
+  .hotel-card {
+    .hotel-card__right {
+      border-left: none;
+      padding-left: 0;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+      align-items: flex-start;
+      text-align: left;
+      flex-direction: row;
       justify-content: space-between;
-      gap: 10px;
-
-      input {
-        width: 100%;
-        padding: 6px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-      }
-    }
-
-    .price-range {
-      font-size: 13px;
-      color: #777;
-      margin-top: 6px;
-    }
-  }
-}
-
-/* Hotel list section */
-.hotel-list-section {
-  flex: 1;
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-
-  .list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    h2 {
-      font-size: 20px;
-      font-weight: 600;
-    }
-
-    .sort-box {
-      display: flex;
       align-items: center;
-      gap: 8px;
 
-      select {
-        padding: 6px 10px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-      }
-    }
-  }
-
-  .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 20px;
-
-    .page-btn {
-      padding: 6px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: #fff;
-      cursor: pointer;
-
-      &.active {
-        background: #0071c2;
-        color: #fff;
-        border-color: #0071c2;
+      .hotel-card__price {
+        text-align: right;
       }
     }
   }

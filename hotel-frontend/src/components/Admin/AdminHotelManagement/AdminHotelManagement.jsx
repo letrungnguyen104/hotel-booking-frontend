@@ -1,6 +1,5 @@
-// src/components/Admin/AdminHotelManagement/AdminHotelManagement.jsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { Table, Button, Space, Tag, message, Input, Select, Card, Modal, Descriptions, Form } from 'antd';
+import { Table, Button, Space, Tag, message, Input, Select, Card, Modal, Descriptions, Form, Dropdown, Menu } from 'antd';
 import {
   CheckCircleOutlined,
   CloseCircleOutlined,
@@ -8,7 +7,9 @@ import {
   StopOutlined,
   SendOutlined,
   CheckSquareOutlined,
-  MessageOutlined
+  MessageOutlined,
+  ExportOutlined,
+  FileExcelOutlined
 } from '@ant-design/icons';
 import { getAllHotelsForAdmin, approveHotel, rejectHotel, banHotel, unbanHotel } from '@/service/hotelService';
 import { toast } from 'sonner';
@@ -18,6 +19,9 @@ import './AdminHotelManagement.scss';
 import { sendNotification } from '@/service/notificationService';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router';
+
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -75,6 +79,43 @@ const AdminHotelManagement = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
+  const handleExport = (fileType) => {
+    const dataToExport = filteredHotels.map((hotel) => ({
+      ID: hotel.id,
+      "Hotel Name": hotel.name,
+      Owner: hotel.owner?.username || "Unknown",
+      "Owner Email": hotel.owner?.email || "",
+      City: hotel.city,
+      Address: hotel.address,
+      Country: hotel.country,
+      Phone: hotel.phone,
+      Status: hotel.status,
+      "Created At": hotel.createdAt ? dayjs(hotel.createdAt).format("DD/MM/YYYY HH:mm") : "",
+      Description: hotel.description
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Hotel List");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    const fileName = `Hotel_List_${dayjs().format("YYYYMMDD_HHmmss")}.xlsx`;
+    saveAs(data, fileName);
+
+    toast.success("Hotel list exported successfully!");
+  };
+
+  const exportMenu = (
+    <Menu onClick={({ key }) => handleExport(key)}>
+      <Menu.Item key="xlsx" icon={<FileExcelOutlined />}>
+        Export to Excel (.xlsx)
+      </Menu.Item>
+    </Menu>
+  );
+
 
   const handleApprove = async (id) => {
     try {
@@ -127,13 +168,11 @@ const AdminHotelManagement = () => {
     }
   };
 
-  // Mở Modal xem chi tiết
   const handleViewDetails = (hotel) => {
     setSelectedHotel(hotel);
     setViewModalOpen(true);
   };
 
-  // Mở Modal gửi thông báo
   const handleOpenNotifyModal = (hotel) => {
     setSelectedHotel(hotel);
     setNotifyModalOpen(true);
@@ -174,16 +213,16 @@ const AdminHotelManagement = () => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 40 },
-    { title: 'Hotel Name', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name), width: 80 },
-    { title: 'Owner', dataIndex: ['owner', 'username'], key: 'owner', width: 80 },
-    { title: 'City', dataIndex: 'city', key: 'city', width: 100 },
-    { title: 'Status', dataIndex: 'status', key: 'status', render: getStatusTag, width: 60 },
+    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id, width: 60 },
+    { title: 'Hotel Name', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name), width: 150 },
+    { title: 'Owner', dataIndex: ['owner', 'username'], key: 'owner', width: 120 },
+    { title: 'City', dataIndex: 'city', key: 'city', width: 120 },
+    { title: 'Status', dataIndex: 'status', key: 'status', render: getStatusTag, width: 100 },
     {
       title: 'Action',
       key: 'action',
       fixed: 'right',
-      width: 290,
+      width: 300,
       render: (_, record) => (
         <Space size="small" wrap>
           <Button icon={<MessageOutlined />} onClick={() => handleChat(record)}>
@@ -232,7 +271,14 @@ const AdminHotelManagement = () => {
 
   return (
     <div className="admin-hotel-management">
-      <Card title="Hotel Management">
+      <Card
+        title="Hotel Management"
+        extra={
+          <Dropdown overlay={exportMenu} trigger={['click']}>
+            <Button icon={<ExportOutlined />}>Export Data</Button>
+          </Dropdown>
+        }
+      >
         <Space style={{ marginBottom: 16, width: '100%' }}>
           <Search
             placeholder="Search by hotel name or owner..."
@@ -265,7 +311,6 @@ const AdminHotelManagement = () => {
         />
       </Card>
 
-      {/* MODAL XEM CHI TIẾT */}
       <Modal
         title="Hotel Details"
         open={viewModalOpen}
@@ -289,7 +334,6 @@ const AdminHotelManagement = () => {
         )}
       </Modal>
 
-      {/* MODAL GỬI THÔNG BÁO */}
       <Modal
         title={`Send Notification to "${selectedHotel?.name}"`}
         open={notifyModalOpen}

@@ -35,6 +35,9 @@ import PromotionManagement from "@/components/Admin/PromotionManagement/Promotio
 import Support from "@/components/Admin/Support/Support";
 import AmenityManagement from "@/components/Admin/AmenityManagement/AmenityManagement";
 import AuditLog from "@/components/Admin/AuditLog/AuditLog";
+import MyWallet from "@/pages/HotelAdmin/MyWallet/MyWallet";
+import WithdrawalManagement from "@/components/Admin/WithdrawalManagement/WithdrawalManagement";
+import PaymentHistory from "@/pages/HotelAdmin/PaymentHistory/PaymentHistory";
 
 
 export const route = [
@@ -64,6 +67,8 @@ export const route = [
           { path: "booking-management", element: <BookingManagement /> },
           { path: "chat", element: <Chat /> },
           { path: "hotel/:id", element: <AdminHotelDetail /> },
+          { path: "wallet", element: <MyWallet /> },
+          { path: "payment-history", element: <PaymentHistory /> },
         ]
       },
     ],
@@ -84,6 +89,7 @@ export const route = [
       { path: "promotion", element: <PromotionManagement /> },
       { path: "amenity", element: <AmenityManagement /> },
       { path: "auditlog", element: <AuditLog /> },
+      { path: "withdrawals", element: <WithdrawalManagement /> },
     ]
   },
 ];

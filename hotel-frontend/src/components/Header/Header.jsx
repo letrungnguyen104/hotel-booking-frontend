@@ -22,7 +22,7 @@ import { checkLogin } from "@/action/login";
 import { setUser, clearUser } from "@/action/user";
 import ClipLoader from "react-spinners/ClipLoader";
 import ForgotPassword from "@/pages/ForgotPassword/ForgotPassword";
-import { connectWebSocket, disconnectWebSocket } from "@/service/websocketService";
+import { connectWebSocket, disconnectWebSocket } from "@/service/webSocketService";
 
 function Header() {
   const navigate = useNavigate();

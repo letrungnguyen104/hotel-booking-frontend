@@ -1,21 +1,53 @@
-// Request
+import store from "@/redux/store";
+import { checkLogin } from "@/action/login";
+import { clearUser } from "@/action/user";
+import { disconnectWebSocket } from "@/service/webSocketService";
 
 const API_DOMAIN = `http://localhost:8081/`;
 
-// Hàm lấy token từ localStorage
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+const handleResponse = async (response) => {
+  if (response.status === 401) {
+    console.warn("Token expired or unauthorized. Logging out...");
+    localStorage.removeItem("token");
+    try {
+      disconnectWebSocket();
+    } catch (e) {
+      console.error("Error disconnecting websocket", e);
+    }
+    store.dispatch(checkLogin(false));
+    store.dispatch(clearUser());
+    return Promise.reject("Session expired");
+  }
+
+  try {
+    const text = await response.text();
+    const result = text ? JSON.parse(text) : {};
+
+    if (!response.ok) {
+      return Promise.reject({ ...result, status: response.status });
+    }
+
+    return result;
+  } catch (error) {
+    if (!response.ok) {
+      return Promise.reject({ status: response.status, message: response.statusText });
+    }
+    return {};
+  }
+};
+
 export const get = async (path) => {
   const response = await fetch(API_DOMAIN + path, {
     headers: {
-      ...getAuthHeaders() // gắn token nếu có
+      ...getAuthHeaders()
     }
   });
-  const result = await response.json();
-  return result;
+  return handleResponse(response);
 };
 
 export const post = async (path, data) => {
@@ -28,8 +60,7 @@ export const post = async (path, data) => {
     },
     body: JSON.stringify(data)
   });
-  const result = await response.json();
-  return result;
+  return handleResponse(response);
 };
 
 export const del = async (path) => {
@@ -39,8 +70,7 @@ export const del = async (path) => {
       ...getAuthHeaders()
     }
   });
-  const result = await response.json();
-  return result;
+  return handleResponse(response);
 };
 
 export const put = async (path, data) => {
@@ -53,8 +83,7 @@ export const put = async (path, data) => {
     },
     body: JSON.stringify(data)
   });
-  const result = await response.json();
-  return result;
+  return handleResponse(response);
 };
 
 export const patch = async (path, data) => {
@@ -67,19 +96,18 @@ export const patch = async (path, data) => {
     },
     body: JSON.stringify(data)
   });
-  const result = await response.json();
-  return result;
+  return handleResponse(response);
 };
 
 export const postFormData = async (path, formData) => {
   const response = await fetch(API_DOMAIN + path, {
     method: "POST",
     headers: {
-      ...getAuthHeaders() // Không set Content-Type, browser tự thêm boundary
+      ...getAuthHeaders()
     },
     body: formData
   });
-  return await response.json();
+  return handleResponse(response);
 };
 
 export const patchFormData = async (path, formData) => {
@@ -90,9 +118,8 @@ export const patchFormData = async (path, formData) => {
     },
     body: formData
   });
-  return await response.json();
+  return handleResponse(response);
 };
-
 
 export const putFormData = async (path, formData) => {
   const response = await fetch(API_DOMAIN + path, {
@@ -102,5 +129,5 @@ export const putFormData = async (path, formData) => {
     },
     body: formData,
   });
-  return await response.json();
+  return handleResponse(response);
 };

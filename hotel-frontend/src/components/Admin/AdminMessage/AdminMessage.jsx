@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getChatHistory, getOnlineUsers, getAdminConversations } from '@/service/chatService';
 import ReportModal from '@/components/ReportModal/ReportModal';
 import './AdminMessage.scss';
-import { sendMessage } from '@/service/websocketService';
+import { sendMessage } from '@/service/webSocketService';
 import {
   setAdminConversations,
   setAdminConversationUnread,

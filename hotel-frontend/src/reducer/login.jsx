@@ -1,4 +1,3 @@
-//login reducer
 const token = localStorage.getItem("token");
 const loginReducer = (state = !!token, action) => {
   switch (action.type) {

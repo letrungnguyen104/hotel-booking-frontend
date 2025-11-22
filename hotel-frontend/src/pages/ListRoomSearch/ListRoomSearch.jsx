@@ -20,7 +20,6 @@ const ListRoomSearch = () => {
   const [originalHotels, setOriginalHotels] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. THÊM STATE CHO AMENITIES
   const [availableAmenities, setAvailableAmenities] = useState([]);
 
   const [filters, setFilters] = useState({

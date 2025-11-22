@@ -160,11 +160,15 @@ const AuditLog = () => {
       dataIndex: "action",
       key: "action",
       width: 180,
-      render: (action) => (
-        <Tag color={getActionColor(action)} style={{ fontWeight: 600 }}>
-          {action}
-        </Tag>
-      ),
+      render: (action) => {
+        return (
+          <Tooltip title={action}>
+            <Tag color={getActionColor(action)} style={{ fontWeight: 600 }}>
+              {action}
+            </Tag>
+          </Tooltip>
+        );
+      },
     },
     {
       title: "Details",

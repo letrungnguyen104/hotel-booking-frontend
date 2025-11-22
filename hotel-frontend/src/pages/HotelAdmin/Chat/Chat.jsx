@@ -34,7 +34,9 @@ const Chat = () => {
 
   const { conversations, messages, onlineUsers } = useSelector(state => state.chatReducer);
 
+  // Lấy thông tin người cần chat
   const chatRecipientId = useSelector(state => state.chatReducer.recipientId);
+  const chatRecipientName = useSelector(state => state.chatReducer.recipientName);
   const chatRecipientHotelId = useSelector(state => state.chatReducer.hotelId);
 
   const isSocketConnected = useSelector(state => state.chatReducer.isSocketConnected);
@@ -46,6 +48,7 @@ const Chat = () => {
     }, 50);
   };
 
+  // 1. Tải danh sách hội thoại
   useEffect(() => {
     if (userDetails) {
       setLoadingConvos(true);
@@ -53,32 +56,8 @@ const Chat = () => {
       getConversations()
         .then(data => {
           const convos = data || [];
+          console.log("1. [API] Fetched conversations:", convos);
           dispatch(setConversations(convos));
-
-          if (chatRecipientId) {
-            const existingConvo = convos.find(c =>
-              c.conversationPartnerId === chatRecipientId &&
-              c.hotelId === chatRecipientHotelId
-            );
-
-            if (existingConvo) {
-              handleSelectConvo(existingConvo);
-            } else {
-              const newConvo = {
-                conversationPartnerId: chatRecipientId,
-                conversationPartnerName: "New Chat",
-                conversationPartnerAvatar: null,
-                lastMessage: 'Start chatting...',
-                timestamp: new Date().toISOString(),
-                unreadCount: 0,
-                hotelId: chatRecipientHotelId,
-                conversationPartnerUsername: "New Chat"
-              };
-              dispatch(setConversations([newConvo, ...convos]));
-              handleSelectConvo(newConvo);
-            }
-            dispatch({ type: 'CLEAR_CHAT_RECIPIENT' });
-          }
         })
         .catch(() => message.error('Failed to load conversations.'))
         .finally(() => setLoadingConvos(false));
@@ -87,7 +66,50 @@ const Chat = () => {
         .then(usernames => dispatch(setOnlineUsers(new Set(usernames))))
         .catch(err => console.error("Failed to fetch initial online users", err));
     }
-  }, [userDetails, dispatch, chatRecipientId, chatRecipientHotelId]);
+  }, [userDetails, dispatch]);
+
+  // 2. Xử lý Logic "Chat with hotel" (ĐÃ SỬA VÀ THÊM LOG)
+  useEffect(() => {
+    console.log("2. [Effect Check] Loading:", loadingConvos, "RecipientID:", chatRecipientId, "Convos Count:", conversations.length);
+
+    // Chỉ chạy khi đã tải xong VÀ có yêu cầu chat
+    if (!loadingConvos && chatRecipientId) {
+      const targetId = parseInt(chatRecipientId);
+      console.log("3. [Logic] Searching for partner ID:", targetId);
+
+      // Tìm trong danh sách hiện tại
+      const existingConvo = conversations.find(c =>
+        c.conversationPartnerId === targetId
+      );
+
+      if (existingConvo) {
+        console.log("4a. [Logic] Found existing conversation:", existingConvo);
+        handleSelectConvo(existingConvo);
+      } else {
+        console.log("4b. [Logic] Not found. Creating new temporary conversation...");
+        const newConvo = {
+          conversationPartnerId: targetId,
+          conversationPartnerName: chatRecipientName || "Hotel Owner",
+          conversationPartnerAvatar: null,
+          lastMessage: 'Start chatting...',
+          timestamp: new Date().toISOString(),
+          unreadCount: 0,
+          hotelId: chatRecipientHotelId,
+          conversationPartnerUsername: chatRecipientName || "Hotel Owner"
+        };
+
+        // Cập nhật Redux
+        dispatch(setConversations([newConvo, ...conversations]));
+        // Chọn luôn
+        handleSelectConvo(newConvo);
+      }
+
+      // Xóa yêu cầu chat để tránh loop
+      console.log("5. [Logic] Clearing recipient request");
+      dispatch({ type: 'CLEAR_CHAT_RECIPIENT' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingConvos, chatRecipientId, conversations]); // <--- QUAN TRỌNG: Đã thêm 'conversations'
 
 
   useEffect(() => {
@@ -102,6 +124,7 @@ const Chat = () => {
   }, [dispatch]);
 
   const handleSelectConvo = async (convo) => {
+    console.log("6. [Select] Selecting conversation:", convo);
     setSelectedConvo(convo);
     setLoadingMessages(true);
     dispatch(setMessages([]));
@@ -109,11 +132,15 @@ const Chat = () => {
     dispatch(setActiveChatPartner(convo.conversationPartnerId));
 
     try {
+      // Nếu là hội thoại giả (mới tạo), có thể chưa có hotelId chính xác nếu API chưa trả về,
+      // nhưng getChatHistory vẫn sẽ chạy tốt nếu BE xử lý được list rỗng.
       const history = await getChatHistory(convo.conversationPartnerId, convo.hotelId);
+      console.log("7. [API] Chat history loaded:", history?.length);
       dispatch(setMessages(history || []));
       dispatch(setConversationUnread(convo.conversationPartnerId));
-    } catch {
-      message.error('Failed to load chat history.');
+    } catch (err) {
+      console.warn("Failed to load history (might be new chat):", err);
+      dispatch(setMessages([]));
     } finally {
       setLoadingMessages(false);
       scrollToBottom();
@@ -260,7 +287,7 @@ const Chat = () => {
                     </div>
                   ))
                 ) : (
-                  <Empty description="Chưa có tin nhắn nào." />
+                  <Empty description="Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!" />
                 )}
               </div>
 
@@ -274,11 +301,7 @@ const Chat = () => {
                   onChange={(e) => setNewMessage(e.target.value)}
                   disabled={!isSocketConnected}
                 />
-                <button
-                  type="submit"
-                  className="send-btn"
-                  disabled={!isSocketConnected}
-                >
+                <button type="submit" className="send-btn" disabled={!isSocketConnected}>
                   <Send size={20} />
                 </button>
               </form>

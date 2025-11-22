@@ -6,6 +6,9 @@ const initialState = {
   onlineUsers: new Set(),
   activeChatPartnerId: null,
   isSocketConnected: false,
+  recipientId: null,
+  recipientName: null,
+  hotelId: null,
 };
 
 const chatReducer = (state = initialState, action) => {
@@ -82,6 +85,22 @@ const chatReducer = (state = initialState, action) => {
         conversations: [newConvoData, ...updatedConvos]
       };
     }
+
+    case 'START_CHAT_WITH':
+      return {
+        ...state,
+        recipientId: action.payload.recipientId,
+        recipientName: action.payload.recipientName,
+        hotelId: action.payload.hotelId,
+      };
+
+    case 'CLEAR_CHAT_RECIPIENT':
+      return {
+        ...state,
+        recipientId: null,
+        recipientName: null,
+        hotelId: null,
+      };
 
     case ChatActionTypes.SET_SOCKET_CONNECTED:
       return {

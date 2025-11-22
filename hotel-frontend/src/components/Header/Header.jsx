@@ -45,7 +45,6 @@ function Header() {
   );
   const dispatch = useDispatch();
 
-  // 2. Dùng ref để ngăn lặp
   const connectionAttempted = useRef(false);
 
   const isHotelAdmin = userDetails?.roles?.some(
